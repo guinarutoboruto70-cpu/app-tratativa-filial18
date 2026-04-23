@@ -277,6 +277,11 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label>Preço de Venda (Hoje) R$</label>
+                    <input type="text" id="t-price-today" placeholder="0,00" oninput="maskMoney(this); updateInternalLossPerc()">
+                </div>
+
                 <div style="margin-bottom: 15px;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
                         <span>% Quebra do Item</span>
@@ -600,6 +605,7 @@
             document.getElementById('t-arrived').value = item.arrived;
             document.getElementById('t-loss').value = item.loss;
             document.getElementById('t-unit-select').value = item.unit;
+            document.getElementById('t-price-today').value = formatCurrency(item.price).replace('R$ ', '');
             updateInternalLossPerc(); renderPhotos();
         }
 
@@ -730,7 +736,7 @@
                 const d = i.date.split('-'); const fDate = `${d[2]}/${d[1]}/${d[0]}`;
                 const arr = i.unit === 'kg' ? i.arrived.toString().replace('.', ',') + ' kg' : i.arrived + ' un';
                 const loss = i.unit === 'kg' ? i.loss.toString().replace('.', ',') + ' kg' : i.loss + ' un';
-                return `Código\nCód: ${i.productCode}\n${i.productName} ${i.unit.toUpperCase()}\n${fDate}\n Chegou: ${arr}\nQuantidade da quebra: ${loss}`;
+                return `Cód: ${i.productCode}\n${i.productName}\nData: ${fDate}\nChegou: ${arr}\nQtd da quebra: ${loss}`;
             }).join('\n\n');
         }
 
@@ -758,8 +764,7 @@
             state.history.filter(h => h.date.startsWith(m)).forEach(h => {
                 if (!days[h.date]) days[h.date] = { venda: 0, quebra: 0 };
                 h.items.forEach(i => {
-                    const p = state.products.find(x => x.code === i.productCode);
-                    days[h.date].quebra += (parseFloat(i.loss)||0) * (p ? (parseFloat(p.price)||0) : 0);
+                    days[h.date].quebra += (parseFloat(i.loss)||0) * (parseFloat(i.price)||0);
                 });
             });
             // Adicionar vendas
@@ -790,12 +795,11 @@
             const ts = state.history.filter(h => h.date.startsWith(m)), vs = state.vendas[m] || {}, fs = state.fluigs[m] || [];
             let totalV = 0; for (let d in vs) totalV += vs[d];
             let totalQB = 0; ts.forEach(t => t.items.forEach(i => {
-                const product = state.products.find(p => p.code === i.productCode);
-                const price = product ? (parseFloat(product.price) || 0) : 0;
+                const price = parseFloat(i.price) || 0;
                 totalQB += (parseFloat(i.loss) || 0) * price;
             }));
-            const totalP = fs.reduce((a,f) => a+f.valor, 0); // R$ Perda (Ajustes/Fluig)
-            const totalPTC = totalQB + totalP; // Perda Total Conciliada (Soma da Quebra + Perda de inventário)
+            const totalP = fs.reduce((a,f) => a+f.valor, 0);
+            const totalPTC = totalQB + totalP;
             const perc = totalV > 0 ? (totalPTC/totalV)*100 : 0;
             const now = new Date(), lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate(), cur = m === now.toISOString().substring(0,7) ? now.getDate() : lastDay;
             return { vendas: totalV, quebraBruta: totalQB, perda: totalP, perdaTotal: totalPTC, percPerdaTotal: perc, projecao: (totalQB/cur)*lastDay };
@@ -831,17 +835,19 @@
         }
         function selectProductForTratativa(id) {
             const p = state.products.find(x => x.id === id); const item = state.tratativa.items[state.tratativa.activeIdx];
-            item.productId = p.id; item.productName = p.name; item.productCode = p.code; item.unit = p.unit; item.price = p.price;
+            item.productId = p.id; item.productName = p.name; item.productCode = p.code;
             document.getElementById('t-autocomplete-results').classList.add('hidden'); renderNewTratativa();
         }
         function updateInternalLossPerc() {
             const item = state.tratativa.items[state.tratativa.activeIdx];
-            item.arrived = parseFloat(document.getElementById('t-arrived').value || 0);
-            item.loss = parseFloat(document.getElementById('t-loss').value || 0);
             item.date = document.getElementById('t-date').value;
-            let perc = item.arrived > 0 ? (item.loss / item.arrived) * 100 : 0;
-            document.getElementById('t-internal-perc').innerText = perc.toFixed(1).replace('.', ',') + '%';
-            document.getElementById('t-internal-progress').style.width = Math.min(100, perc) + '%';
+            item.arrived = parseFloat(document.getElementById('t-arrived').value) || 0;
+            item.loss = parseFloat(document.getElementById('t-loss').value) || 0;
+            item.price = parseMoney(document.getElementById('t-price-today').value);
+            const perc = item.arrived > 0 ? (item.loss / item.arrived) * 100 : 0;
+            document.getElementById('t-internal-perc').innerText = perc.toFixed(1) + '%';
+            document.getElementById('t-internal-progress').style.width = Math.min(perc, 100) + '%';
+            document.getElementById('t-internal-progress').style.background = perc > state.settings.meta ? 'var(--danger)' : 'var(--success)';
         }
         function renderHistory() {
             const list = document.getElementById('history-list');
@@ -849,16 +855,16 @@
         }
         function viewHistoryDetail(id) { state.currentDispatch = state.history.find(h => h.id === id); switchTab('dispatch'); }
         function showProductModal(id = null) {
-            const p = id ? state.products.find(x => x.id === id) : { name: '', code: '', unit: 'kg', price: 0 };
+            const p = id ? state.products.find(x => x.id === id) : { name: '', code: '' };
             const modal = document.getElementById('modal'); const content = document.getElementById('modal-content');
-            content.innerHTML = `<div class="modal-header"><h3>${id ? 'Editar' : 'Novo'} Produto</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Código</label><input type="text" id="m-p-code" value="${p.code}"></div><div class="form-group"><label>Nome</label><input type="text" id="m-p-name" value="${p.name}"></div><div class="summary-grid"><div class="form-group"><label>Unidade</label><select id="m-p-unit"><option value="kg" ${p.unit==='kg'?'selected':''}>kg</option><option value="un" ${p.unit==='un'?'selected':''}>un</option></select></div><div class="form-group"><label>Preço R$</label><input type="text" id="m-p-price" value="${formatCurrency(p.price).replace('R$ ', '')}" oninput="maskMoney(this)"></div></div><button class="btn btn-primary btn-block" onclick="saveProduct('${id||''}')">Salvar</button>`;
+            content.innerHTML = `<div class="modal-header"><h3>${id ? 'Editar' : 'Novo'} Produto</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Código</label><input type="text" id="m-p-code" value="${p.code}"></div><div class="form-group"><label>Nome</label><input type="text" id="m-p-name" value="${p.name}"></div><button class="btn btn-primary btn-block" onclick="saveProduct('${id||''}')">Salvar Produto</button>`;
             modal.style.display = 'flex';
         }
         async function saveProduct(id) {
-            const name = document.getElementById('m-p-name').value, code = document.getElementById('m-p-code').value, unit = document.getElementById('m-p-unit').value, price = parseMoney(document.getElementById('m-p-price').value);
+            const name = document.getElementById('m-p-name').value, code = document.getElementById('m-p-code').value;
             if (!name || !code) return showToast('Preencha tudo!');
-            if (id) { const idx = state.products.findIndex(p => p.id === id); state.products[idx] = { ...state.products[idx], name, code, unit, price }; }
-            else { state.products.push({ id: Date.now()+'', name, code, unit, price, deleted: false }); }
+            if (id) { const idx = state.products.findIndex(p => p.id === id); state.products[idx] = { ...state.products[idx], name, code }; }
+            else { state.products.push({ id: Date.now()+'', name, code, unit: 'kg', price: 0, deleted: false }); }
             DB.save('products', state.products); closeModal(); renderProducts();
         }
         function deleteProduct(id) { if (confirm('Excluir?')) { const idx = state.products.findIndex(p => p.id === id); state.products[idx].deleted = true; DB.save('products', state.products); renderProducts(); } }
