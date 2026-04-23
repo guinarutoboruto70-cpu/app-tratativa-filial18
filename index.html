@@ -347,14 +347,16 @@
                 <select id="dash-month-selector" onchange="loadDashboard()"></select>
             </div>
             <div class="card text-center">
-                <h2 id="dash-status-text" style="color: var(--success);">✅ BOM</h2>
-                <p style="font-size: 0.9rem; color: var(--text-muted);">vs meta de <span id="dash-meta-val">3,5</span>%</p>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px;">SITUAÇÃO</div>
+                <h2 id="dash-status-text" style="color: var(--success); font-size: 2rem; letter-spacing: 2px;">BOM</h2>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">% PERDA TOTAL CONCILIADA: <span id="dash-perc-val" class="mono" style="font-weight: 700;">0,00%</span></p>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Meta: <span id="dash-meta-val">3,5</span>%</p>
             </div>
             <div class="summary-grid">
-                <div class="card summary-card"><span class="label">Vendas</span><span class="value mono" id="dash-vendas">R$ 0,00</span></div>
-                <div class="card summary-card"><span class="label">Quebra Bruta</span><span class="value mono" id="dash-quebra-bruta">R$ 0,00</span></div>
-                <div class="card summary-card"><span class="label">Fluig Aprovado</span><span class="value mono" id="dash-fluig">R$ 0,00</span></div>
-                <div class="card summary-card"><span class="label">Quebra Líquida</span><span class="value mono" id="dash-quebra-liquida">R$ 0,00</span></div>
+                <div class="card summary-card"><span class="label">VENDA TOTAL</span><span class="value mono" id="dash-vendas">R$ 0,00</span></div>
+                <div class="card summary-card"><span class="label">R$ QUEBRA</span><span class="value mono" id="dash-quebra-bruta">R$ 0,00</span></div>
+                <div class="card summary-card"><span class="label">R$ PERDA</span><span class="value mono" id="dash-perda">R$ 0,00</span></div>
+                <div class="card summary-card"><span class="label">R$ PERDA TOTAL CONCILIADA</span><span class="value mono" id="dash-perda-total">R$ 0,00</span></div>
             </div>
             <div class="card">
                 <h3>Projeção do Mês</h3>
@@ -362,8 +364,26 @@
             </div>
             <div class="card">
                 <button class="btn btn-outline btn-block mb-10" onclick="showVendaModal()">Vendas do Dia</button>
-                <button class="btn btn-outline btn-block mb-10" onclick="showFluigModal()">Fluig Aprovado</button>
+                <button class="btn btn-outline btn-block mb-10" onclick="showFluigModal()">R$ Perda (Ajustes)</button>
                 <button class="btn btn-outline btn-block" onclick="showMetaModal()">Editar Meta %</button>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase;">Evolução Diária e Impacto</h3>
+                <div id="dash-evolution-table" style="font-size: 0.75rem;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eee; text-align: left;">
+                                <th style="padding: 5px;">DATA</th>
+                                <th style="padding: 5px;">VENDA</th>
+                                <th style="padding: 5px;">QUEBRA</th>
+                                <th style="padding: 5px;">% DIA</th>
+                                <th style="padding: 5px;">IMP.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-evolution-body"></tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -718,14 +738,53 @@
         function renderDashboard() { const sel = document.getElementById('dash-month-selector'); const ms = getAvailableMonths(); sel.innerHTML = ms.map(m => `<option value="${m}">${formatMonth(m)}</option>`).join(''); loadDashboard(); }
         function loadDashboard() {
             const m = document.getElementById('dash-month-selector').value; const s = calculateMonthStats(m);
-            document.getElementById('dash-status-text').innerText = s.percLiquida > state.settings.meta ? '🔴 ALERTA' : '✅ BOM';
-            document.getElementById('dash-status-text').style.color = s.percLiquida > state.settings.meta ? 'var(--danger)' : 'var(--success)';
+            const isAlerta = Math.abs(s.percPerdaTotal) > state.settings.meta;
+            document.getElementById('dash-status-text').innerText = isAlerta ? '🔴 ALERTA' : '✅ BOM';
+            document.getElementById('dash-status-text').style.color = isAlerta ? 'var(--danger)' : 'var(--success)';
             document.getElementById('dash-vendas').innerText = formatCurrency(s.vendas);
             document.getElementById('dash-quebra-bruta').innerText = formatCurrency(s.quebraBruta);
-            document.getElementById('dash-fluig').innerText = formatCurrency(s.fluig);
-            document.getElementById('dash-quebra-liquida').innerText = formatCurrency(s.quebraLiquida);
+            document.getElementById('dash-perda').innerText = formatCurrency(s.perda);
+            document.getElementById('dash-perda-total').innerText = formatCurrency(s.perdaTotal);
             document.getElementById('dash-proj-text').innerText = `${formatCurrency(s.quebraBruta)} / ${formatCurrency(s.projecao)}`;
+            document.getElementById('dash-perc-val').innerText = Math.abs(s.percPerdaTotal).toFixed(2).replace('.', ',') + '%';
             document.getElementById('dash-meta-val').innerText = state.settings.meta.toString().replace('.', ',');
+            renderEvolutionTable(m);
+        }
+
+        function renderEvolutionTable(m) {
+            const body = document.getElementById('dash-evolution-body');
+            const days = {};
+            // Agrupar quebras por dia
+            state.history.filter(h => h.date.startsWith(m)).forEach(h => {
+                if (!days[h.date]) days[h.date] = { venda: 0, quebra: 0 };
+                h.items.forEach(i => {
+                    const p = state.products.find(x => x.code === i.productCode);
+                    days[h.date].quebra += (parseFloat(i.loss)||0) * (p ? (parseFloat(p.price)||0) : 0);
+                });
+            });
+            // Adicionar vendas
+            const monthVendas = state.vendas[m] || {};
+            for (let d in monthVendas) {
+                if (!days[d]) days[d] = { venda: 0, quebra: 0 };
+                days[d].venda = monthVendas[d];
+            }
+            
+            const sortedDays = Object.keys(days).sort().reverse();
+            body.innerHTML = sortedDays.map(d => {
+                const day = days[d];
+                const perc = day.venda > 0 ? (day.quebra / day.venda) * 100 : 0;
+                const impact = perc > state.settings.meta ? '<span style="color:var(--danger)">📈</span>' : (day.venda > 0 ? '<span style="color:var(--success)">📉</span>' : '-');
+                const dateParts = d.split('-');
+                return `
+                    <tr style="border-bottom: 1px solid #f5f5f5;">
+                        <td style="padding: 8px 5px;">${dateParts[2]}/${dateParts[1]}</td>
+                        <td style="padding: 8px 5px;">${day.venda.toFixed(0)}</td>
+                        <td style="padding: 8px 5px;">${day.quebra.toFixed(0)}</td>
+                        <td style="padding: 8px 5px; font-weight:700">${perc.toFixed(1)}%</td>
+                        <td style="padding: 8px 5px; text-align:center">${impact}</td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="5" style="text-align:center; padding:10px;">Sem dados este mês.</td></tr>';
         }
         function calculateMonthStats(m) {
             const ts = state.history.filter(h => h.date.startsWith(m)), vs = state.vendas[m] || {}, fs = state.fluigs[m] || [];
@@ -735,10 +794,11 @@
                 const price = product ? (parseFloat(product.price) || 0) : 0;
                 totalQB += (parseFloat(i.loss) || 0) * price;
             }));
-            const totalF = fs.reduce((a,f) => a+f.valor, 0); const totalQL = totalQB - totalF;
-            const perc = totalV > 0 ? (totalQL/totalV)*100 : 0;
+            const totalP = fs.reduce((a,f) => a+f.valor, 0); // R$ Perda (Ajustes/Fluig)
+            const totalPTC = totalQB + totalP; // Perda Total Conciliada (Soma da Quebra + Perda de inventário)
+            const perc = totalV > 0 ? (totalPTC/totalV)*100 : 0;
             const now = new Date(), lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate(), cur = m === now.toISOString().substring(0,7) ? now.getDate() : lastDay;
-            return { vendas: totalV, quebraBruta: totalQB, fluig: totalF, quebraLiquida: totalQL, percLiquida: perc, projecao: (totalQB/cur)*lastDay };
+            return { vendas: totalV, quebraBruta: totalQB, perda: totalP, perdaTotal: totalPTC, percPerdaTotal: perc, projecao: (totalQB/cur)*lastDay };
         }
 
         // --- OUTRAS FUNCOES ---
@@ -748,12 +808,12 @@
             document.getElementById('home-today-count').innerText = todayTratativas.length;
             const monthData = calculateMonthStats(today.substring(0, 7));
             document.getElementById('home-total-bruta').innerText = formatCurrency(monthData.quebraBruta);
-            document.getElementById('home-perc-quebra').innerText = monthData.percLiquida.toFixed(1).replace('.', ',') + '%';
+            document.getElementById('home-perc-quebra').innerText = Math.abs(monthData.percPerdaTotal).toFixed(1).replace('.', ',') + '%';
             const badge = document.getElementById('home-status-badge');
-            const isAlert = monthData.percLiquida > state.settings.meta;
+            const isAlert = Math.abs(monthData.percPerdaTotal) > state.settings.meta;
             badge.innerText = isAlert ? 'ALERTA' : 'BOM';
             badge.className = 'badge ' + (isAlert ? 'badge-danger' : 'badge-success');
-            document.getElementById('home-meta-progress').style.width = Math.min(100, (monthData.percLiquida / state.settings.meta) * 100) + '%';
+            document.getElementById('home-meta-progress').style.width = Math.min(100, (Math.abs(monthData.percPerdaTotal) / state.settings.meta) * 100) + '%';
             const list = document.getElementById('home-recent-list');
             const recent = state.history.slice(0, 5);
             list.innerHTML = recent.length ? recent.map(h => `<div class="card" style="padding: 10px; font-size: 0.9rem;"><div style="display: flex; justify-content: space-between;"><strong>${h.items[0].productName}</strong><span class="mono">${formatDate(h.date)}</span></div></div>`).join('') : '<p class="text-center" style="color: #999; padding: 20px;">Nenhuma tratativa recente.</p>';
@@ -791,11 +851,11 @@
         function showProductModal(id = null) {
             const p = id ? state.products.find(x => x.id === id) : { name: '', code: '', unit: 'kg', price: 0 };
             const modal = document.getElementById('modal'); const content = document.getElementById('modal-content');
-            content.innerHTML = `<div class="modal-header"><h3>${id ? 'Editar' : 'Novo'} Produto</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Código</label><input type="text" id="m-p-code" value="${p.code}"></div><div class="form-group"><label>Nome</label><input type="text" id="m-p-name" value="${p.name}"></div><div class="summary-grid"><div class="form-group"><label>Unidade</label><select id="m-p-unit"><option value="kg" ${p.unit==='kg'?'selected':''}>kg</option><option value="un" ${p.unit==='un'?'selected':''}>un</option></select></div><div class="form-group"><label>Preço R$</label><input type="number" step="0.01" id="m-p-price" value="${p.price}"></div></div><button class="btn btn-primary btn-block" onclick="saveProduct('${id||''}')">Salvar</button>`;
+            content.innerHTML = `<div class="modal-header"><h3>${id ? 'Editar' : 'Novo'} Produto</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Código</label><input type="text" id="m-p-code" value="${p.code}"></div><div class="form-group"><label>Nome</label><input type="text" id="m-p-name" value="${p.name}"></div><div class="summary-grid"><div class="form-group"><label>Unidade</label><select id="m-p-unit"><option value="kg" ${p.unit==='kg'?'selected':''}>kg</option><option value="un" ${p.unit==='un'?'selected':''}>un</option></select></div><div class="form-group"><label>Preço R$</label><input type="text" id="m-p-price" value="${formatCurrency(p.price).replace('R$ ', '')}" oninput="maskMoney(this)"></div></div><button class="btn btn-primary btn-block" onclick="saveProduct('${id||''}')">Salvar</button>`;
             modal.style.display = 'flex';
         }
         async function saveProduct(id) {
-            const name = document.getElementById('m-p-name').value, code = document.getElementById('m-p-code').value, unit = document.getElementById('m-p-unit').value, price = parseFloat(document.getElementById('m-p-price').value || 0);
+            const name = document.getElementById('m-p-name').value, code = document.getElementById('m-p-code').value, unit = document.getElementById('m-p-unit').value, price = parseMoney(document.getElementById('m-p-price').value);
             if (!name || !code) return showToast('Preencha tudo!');
             if (id) { const idx = state.products.findIndex(p => p.id === id); state.products[idx] = { ...state.products[idx], name, code, unit, price }; }
             else { state.products.push({ id: Date.now()+'', name, code, unit, price, deleted: false }); }
@@ -804,20 +864,20 @@
         function deleteProduct(id) { if (confirm('Excluir?')) { const idx = state.products.findIndex(p => p.id === id); state.products[idx].deleted = true; DB.save('products', state.products); renderProducts(); } }
         function showVendaModal() {
             const m = document.getElementById('dash-month-selector').value; const modal = document.getElementById('modal'); const content = document.getElementById('modal-content');
-            content.innerHTML = `<div class="modal-header"><h3>Vendas do Dia</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Data</label><input type="date" id="m-v-date" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label>Valor R$</label><input type="number" step="0.01" id="m-v-val"></div><button class="btn btn-primary btn-block" onclick="saveVenda()">Salvar Venda</button>`;
+            content.innerHTML = `<div class="modal-header"><h3>Vendas do Dia</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Data</label><input type="date" id="m-v-date" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label>Valor R$</label><input type="text" id="m-v-val" placeholder="0,00" oninput="maskMoney(this)"></div><button class="btn btn-primary btn-block" onclick="saveVenda()">Salvar Venda</button>`;
             modal.style.display = 'flex';
         }
         function saveVenda() {
-            const d = document.getElementById('m-v-date').value, v = parseFloat(document.getElementById('m-v-val').value || 0), m = d.substring(0,7);
+            const d = document.getElementById('m-v-date').value, v = parseMoney(document.getElementById('m-v-val').value), m = d.substring(0,7);
             if (!state.vendas[m]) state.vendas[m] = {}; state.vendas[m][d] = v; DB.save('vendas', state.vendas); closeModal(); loadDashboard();
         }
         function showFluigModal() {
             const m = document.getElementById('dash-month-selector').value; const modal = document.getElementById('modal'); const content = document.getElementById('modal-content');
-            content.innerHTML = `<div class="modal-header"><h3>Fluig Aprovado</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Descrição</label><input type="text" id="m-f-desc"></div><div class="form-group"><label>Valor R$</label><input type="number" step="0.01" id="m-f-val"></div><button class="btn btn-primary btn-block" onclick="saveFluig()">Salvar Fluig</button>`;
+            content.innerHTML = `<div class="modal-header"><h3>Fluig Aprovado</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Descrição</label><input type="text" id="m-f-desc"></div><div class="form-group"><label>Valor R$</label><input type="text" id="m-f-val" placeholder="0,00" oninput="maskMoney(this)"></div><button class="btn btn-primary btn-block" onclick="saveFluig()">Salvar Fluig</button>`;
             modal.style.display = 'flex';
         }
         function saveFluig() {
-            const m = document.getElementById('dash-month-selector').value, d = document.getElementById('m-f-desc').value, v = parseFloat(document.getElementById('m-f-val').value || 0);
+            const m = document.getElementById('dash-month-selector').value, d = document.getElementById('m-f-desc').value, v = parseMoney(document.getElementById('m-f-val').value);
             if (!state.fluigs[m]) state.fluigs[m] = []; state.fluigs[m].push({ desc: d, valor: v }); DB.save('fluigs', state.fluigs); closeModal(); loadDashboard();
         }
         function showMetaModal() {
@@ -833,6 +893,17 @@
         function formatMonth(m) { const p = m.split('-'); const ms = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; return `${ms[parseInt(p[1])-1]}/${p[0]}`; }
         function getAvailableMonths() { const ms = new Set(); ms.add(new Date().toISOString().substring(0,7)); state.history.forEach(h => ms.add(h.date.substring(0,7))); return Array.from(ms).sort().reverse(); }
         function setupServiceWorker() { if ('serviceWorker' in navigator) { const blob = new Blob(['self.addEventListener("fetch", e => e.respondWith(fetch(e.request)))'], { type: 'application/javascript' }); navigator.serviceWorker.register(URL.createObjectURL(blob)); } }
+        
+        function maskMoney(input) {
+            let v = input.value.replace(/\D/g, '');
+            v = (v / 100).toFixed(2).replace('.', ',');
+            v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+            input.value = v;
+        }
+        function parseMoney(v) {
+            if (!v) return 0;
+            return parseFloat(v.replace(/\./g, '').replace(',', '.'));
+        }
         function resetTratativa() { if(confirm('Limpar tudo?')) { state.tratativa = { items: [createNewItem()], activeIdx: 0 }; renderNewTratativa(); } }
     </script>
 </body>
