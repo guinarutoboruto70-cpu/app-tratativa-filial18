@@ -191,64 +191,49 @@
             </div>
 
             <div class="card">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
-                    <span>Meta Mensal</span>
-                    <span class="mono">3,5%</span>
-                </div>
-                <div class="meta-bar">
-                    <div id="home-meta-progress" class="meta-progress" style="width: 0%;"></div>
-                </div>
+                <h3>Progresso Meta (3,5%)</h3>
+                <div class="meta-bar"><div id="home-meta-progress" class="meta-progress" style="width: 0%"></div></div>
             </div>
 
-            <button class="btn btn-primary btn-block mb-10" onclick="switchTab('new-tratativa')">
-                <span>➕ Nova Tratativa</span>
-            </button>
-
-            <h3 style="margin: 20px 0 10px;">Recentes do Mês</h3>
-            <div id="home-recent-list">
-                <p class="text-center" style="color: #999; padding: 20px;">Nenhuma tratativa este mês.</p>
-            </div>
+            <h3 class="mb-10">Recentes</h3>
+            <div id="home-recent-list"></div>
         </section>
 
         <!-- TELA PRODUTOS -->
         <section id="screen-products" class="screen">
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 id="product-count-badge">Produtos</h3>
-                    <span class="badge badge-success" style="font-size: 0.6rem;">Total: <span id="product-total-counter">0</span></span>
-                </div>
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                     <input type="text" id="product-search" placeholder="Buscar código ou nome..." oninput="filterProductsList()">
-                    <button class="btn btn-primary" onclick="triggerOCR('camera')">📷</button>
-                    <button class="btn btn-primary" onclick="triggerOCR('gallery')">🖼️</button>
+                    <button class="btn btn-primary" onclick="showProductModal()">➕</button>
                 </div>
-                <button class="btn btn-primary btn-block mb-10" onclick="showProductModal()">
-                    <span>➕ Novo Produto</span>
-                </button>
-                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-outline btn-block" onclick="triggerOCR('camera')">📷 Nota</button>
+                    <button class="btn btn-outline btn-block" onclick="triggerOCR('gallery')">🖼️ Nota</button>
+                </div>
                 <input type="file" id="ocr-input-camera" accept="image/*" capture="environment" class="hidden" onchange="handleOCR(this)">
                 <input type="file" id="ocr-input-gallery" accept="image/*" class="hidden" onchange="handleOCR(this)">
-
-                <div id="product-list"></div>
             </div>
+
+            <div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+                <span>Lista de Produtos</span>
+                <span>Total: <b id="product-total-counter">0</b></span>
+            </div>
+            <div id="product-list"></div>
         </section>
 
         <!-- TELA NOVA TRATATIVA -->
         <section id="screen-new-tratativa" class="screen">
             <div id="tratativa-tabs" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px;"></div>
-            
+
             <div class="card">
-                <div class="form-group" style="position: relative;">
+                <div class="form-group">
                     <label>PRODUTO *</label>
-                    <input type="text" id="t-product-input" placeholder="Digite código ou nome..." oninput="handleProductAutocomplete(this)">
+                    <input type="text" id="t-product-input" placeholder="Buscar por nome ou código..." oninput="handleProductAutocomplete(this)">
                     <div id="t-autocomplete-results" class="autocomplete-results hidden"></div>
                 </div>
 
-                <div class="summary-grid">
-                    <div class="form-group">
-                        <label>DATA</label>
-                        <input type="date" id="t-date">
-                    </div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+                    <div class="form-group"><label>DATA</label><input type="date" id="t-date" onchange="updateInternalLossPerc()"></div>
                     <div class="form-group">
                         <label>UNIDADE</label>
                         <select id="t-unit-select" onchange="updateItemUnit(this.value)">
@@ -258,143 +243,142 @@
                     </div>
                 </div>
 
-                <div class="summary-grid">
-                    <div class="form-group">
-                        <label>Chegou (<span class="t-unit-label">kg</span>)</label>
-                        <input type="number" step="0.01" id="t-arrived" placeholder="0.00" oninput="updateInternalLossPerc()">
-                    </div>
-                    <div class="form-group">
-                        <label>Quebra (<span class="t-unit-label">kg</span>)</label>
-                        <input type="number" step="0.01" id="t-loss" placeholder="0.00" oninput="updateInternalLossPerc()">
-                    </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group"><label>CHEGOU (<span class="t-unit-label">kg</span>)</label><input type="number" id="t-arrived" step="0.01" oninput="updateInternalLossPerc()"></div>
+                    <div class="form-group"><label>QUEBRA (<span class="t-unit-label">kg</span>)</label><input type="number" id="t-loss" step="0.01" oninput="updateInternalLossPerc()"></div>
                 </div>
 
                 <div class="form-group">
-                    <label>Preço de Venda (Hoje) R$</label>
-                    <input type="text" id="t-price-today" placeholder="0,00" oninput="maskMoney(this); updateInternalLossPerc()">
+                    <label>PREÇO DE VENDA (HOJE)</label>
+                    <div style="position: relative;">
+                        <span style="position: absolute; left: 10px; top: 12px; font-weight: 700;">R$</span>
+                        <input type="text" id="t-price-today" style="padding-left: 35px;" oninput="maskMoney(this); updateInternalLossPerc()">
+                    </div>
                 </div>
 
-                <div style="margin-bottom: 15px;">
+                <div style="margin: 10px 0;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
                         <span>% Quebra do Item</span>
-                        <span id="t-internal-perc" class="mono">0.0%</span>
+                        <span id="t-internal-perc" style="font-weight: 700;">0,0%</span>
                     </div>
-                    <div class="meta-bar">
-                        <div id="t-internal-progress" class="meta-progress" style="width: 0%;"></div>
-                    </div>
+                    <div class="meta-bar"><div id="t-internal-progress" class="meta-progress" style="width: 0%"></div></div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>📷 FOTOS DO PRODUTO <span style="font-size: 0.7rem; color: #999;">(GALERIA)</span></label>
-                    <div id="p-produto-grid" class="photo-grid"></div>
-                    <button class="btn btn-outline btn-block mt-10" onclick="captureMedia('produto', 'gallery')">🖼️ Galeria</button>
-                </div>
+            <div class="card">
+                <label>📷 FOTOS DO PRODUTO (GALERIA)</label>
+                <button class="btn btn-outline btn-block" onclick="captureMedia('produto', 'gallery')">🖼️ Selecionar Fotos</button>
+                <div id="p-produto-grid" class="photo-grid"></div>
+            </div>
 
-                <div class="form-group">
-                    <label>⚖️ FOTOS DA BALANÇA <span style="font-size: 0.7rem; color: #999;">(GALERIA)</span></label>
-                    <div id="p-balanca-grid" class="photo-grid"></div>
-                    <button class="btn btn-outline btn-block mt-10" onclick="captureMedia('balanca', 'gallery')">🖼️ Galeria</button>
-                </div>
+            <div class="card">
+                <label>⚖️ FOTOS DA BALANÇA (GALERIA)</label>
+                <button class="btn btn-outline btn-block" onclick="captureMedia('balanca', 'gallery')">🖼️ Selecionar Fotos</button>
+                <div id="p-balanca-grid" class="photo-grid"></div>
+            </div>
 
-                <div class="form-group">
-                    <label>🏷️ FOTO DA ETIQUETA <span style="font-size: 0.7rem; color: #999;">(CÂMERA)</span></label>
-                    <div id="p-etiqueta-grid" class="photo-grid"></div>
-                    <button class="btn btn-outline btn-block mt-10" onclick="captureMedia('etiqueta', 'camera')">📷 Câmera</button>
-                </div>
+            <div class="card">
+                <label>🏷️ FOTO DA ETIQUETA (CÂMERA)</label>
+                <button class="btn btn-outline btn-block" onclick="captureMedia('etiqueta', 'camera')">📷 Tirar Foto</button>
+                <div id="p-etiqueta-grid" class="photo-grid"></div>
+            </div>
 
-                <input type="file" id="media-input-camera" accept="image/*" capture="environment" class="hidden" onchange="processMedia(this)">
-                <input type="file" id="media-input-gallery" accept="image/*" multiple class="hidden" onchange="processMedia(this)">
+            <input type="file" id="media-input-camera" accept="image/*" capture="environment" class="hidden" onchange="processMedia(this)">
+            <input type="file" id="media-input-gallery" accept="image/*" multiple class="hidden" onchange="processMedia(this)">
 
-                <div class="summary-grid">
-                    <button class="btn btn-outline btn-block" onclick="resetTratativa()">Limpar</button>
-                    <button class="btn btn-primary btn-block" onclick="saveAndGoToDispatch()">Salvar Tratativa</button>
-                </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="resetTratativa()">Limpar</button>
+                <button class="btn btn-primary" onclick="saveAndGoToDispatch()">Salvar Tratativa</button>
             </div>
         </section>
 
-        <!-- TELA DE DESPACHO (ENVIO) -->
+        <!-- TELA DESPACHO (NOVA) -->
         <section id="screen-dispatch" class="screen">
             <div class="card">
-                <h3 style="color: var(--primary-green); margin-bottom: 10px;">Tratativa Salva! ✅</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted);">Siga a ordem abaixo para enviar tudo ao WhatsApp do responsável.</p>
+                <h3 style="color: var(--primary-green); margin-bottom: 10px;">Tratativa Salva!</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 15px;">A tratativa foi gravada com sucesso. Siga a ordem abaixo para enviar ao WhatsApp:</p>
+                
+                <div class="form-group">
+                    <label>Texto da Tratativa</label>
+                    <textarea id="dispatch-text" style="height: 150px; font-size: 0.85rem; background: #f9f9f9;" readonly></textarea>
+                </div>
+                
+                <button class="btn btn-primary btn-block" onclick="sendToWhatsAppText()">1. Enviar Texto p/ WhatsApp</button>
             </div>
 
             <div class="card">
-                <label>PASSO 1: ENVIAR TEXTO</label>
-                <div id="dispatch-text-preview" class="mono" style="background: #f5f5f5; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin: 10px 0; white-space: pre-wrap;"></div>
-                <button class="btn btn-primary btn-block" onclick="dispatchWhatsAppText()">
-                    <span>💬 Enviar Texto no WhatsApp</span>
-                </button>
-            </div>
-
-            <div id="dispatch-media-container"></div>
-
-            <div class="card">
-                <button class="btn btn-outline btn-block" onclick="switchTab('home')">Voltar ao Início</button>
+                <h3>2. Enviar Fotos</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Compartilhe cada foto abaixo na mesma conversa do WhatsApp:</p>
+                
+                <div id="dispatch-media-list"></div>
+                
+                <button class="btn btn-outline btn-block mt-10" onclick="switchTab('home')">Concluir e Voltar</button>
             </div>
         </section>
 
         <!-- TELA DASHBOARD -->
         <section id="screen-dashboard" class="screen">
-            <div class="card">
-                <select id="dash-month-selector" onchange="loadDashboard()"></select>
-            </div>
             <div class="card text-center">
-                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px;">SITUAÇÃO</div>
-                <h2 id="dash-status-text" style="color: var(--success); font-size: 2rem; letter-spacing: 2px;">BOM</h2>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">% PERDA TOTAL CONCILIADA: <span id="dash-perc-val" class="mono" style="font-weight: 700;">0,00%</span></p>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Meta: <span id="dash-meta-val">3,5</span>%</p>
+                <select id="dash-month-selector" onchange="loadDashboard()" style="width: auto; margin-bottom: 10px; font-weight: 700;"></select>
+                <div id="dash-status-text" style="font-size: 1.5rem; font-weight: 800;">BOM</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">SITUAÇÃO ATUAL</p>
             </div>
+
             <div class="summary-grid">
-                <div class="card summary-card" onclick="showVendaModal()" style="cursor: pointer; border: 1px dashed var(--primary-green);">
-                    <span class="label">VENDA TOTAL (MÊS) 📝</span>
+                <div class="card summary-card" onclick="showVendaModal()" style="cursor: pointer; border: 1px solid #ddd;">
+                    <span class="label">VENDA TOTAL 📝</span>
                     <span class="value mono" id="dash-vendas">R$ 0,00</span>
                 </div>
                 <div class="card summary-card">
-                    <span class="label">R$ QUEBRA (MÊS)</span>
+                    <span class="label">R$ QUEBRA BRUTA</span>
                     <span class="value mono" id="dash-quebra-bruta">R$ 0,00</span>
                 </div>
-                <div class="card summary-card" onclick="showFluigModal()" style="cursor: pointer; border: 1px dashed var(--primary-green);">
+                <div class="card summary-card" onclick="showFluigModal()" style="cursor: pointer; border: 1px solid #ddd;">
                     <span class="label">R$ PERDA (AJUSTES) 📝</span>
                     <span class="value mono" id="dash-perda">R$ 0,00</span>
                 </div>
                 <div class="card summary-card">
                     <span class="label">PERDA TOTAL CONCILIADA</span>
-                    <span class="value mono" id="dash-perda-total">R$ 0,00</span>
+                    <span class="value mono" id="dash-perda-total" style="color: var(--primary-green);">R$ 0,00</span>
                 </div>
-            </div>
-            <div class="card">
-                <h3>Projeção do Mês</h3>
-                <div id="dash-proj-text" class="mono" style="font-weight: 700; margin-bottom: 5px;">R$ 0,00 / R$ 0,00</div>
-            </div>
-            <div class="card">
-                <button class="btn btn-outline btn-block mb-10" onclick="showVendaModal()">Vendas do Dia</button>
-                <button class="btn btn-outline btn-block mb-10" onclick="showFluigModal()">R$ Perda (Ajustes)</button>
-                <button class="btn btn-outline btn-block" onclick="showMetaModal()">Editar Meta %</button>
             </div>
 
             <div class="card">
-                <h3 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase;">Evolução Diária e Impacto</h3>
-                <div id="dash-evolution-table" style="font-size: 0.75rem;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid #eee; text-align: left;">
-                                <th style="padding: 8px 0;">Data</th>
-                                <th>Venda</th>
-                                <th>Quebra</th>
-                                <th>% Dia</th>
-                                <th>Impacto</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dash-evolution-body"></tbody>
-                    </table>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>% Perda Total Conciliada</h3>
+                    <span id="dash-perc-val" style="font-size: 1.5rem; font-weight: 800; color: var(--primary-green);">0,00%</span>
                 </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Meta da Empresa: <span id="dash-meta-val">3,5</span>%</p>
+                <div class="meta-bar"><div id="dash-meta-progress" class="meta-progress" style="width: 0%"></div></div>
+            </div>
+
+            <div class="card">
+                <h3>Projeção do Mês (Quebra)</h3>
+                <p id="dash-proj-text" class="mono" style="font-size: 1.1rem; font-weight: 700;">R$ 0,00 / R$ 0,00</p>
+                <p style="font-size: 0.7rem; color: var(--text-muted);">Acumulado Atual / Estimativa Final</p>
+            </div>
+
+            <h3 class="mb-10">Evolução Diária e Impacto</h3>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+                    <thead>
+                        <tr style="background: #f0f0f0; text-align: left;">
+                            <th style="padding: 10px;">Data</th>
+                            <th>Venda</th>
+                            <th>Quebra</th>
+                            <th>% Dia</th>
+                            <th>Impacto</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dash-evolution-body"></tbody>
+                </table>
             </div>
         </section>
 
         <!-- TELA HISTÓRICO -->
         <section id="screen-history" class="screen">
+            <h3 class="mb-10">Histórico de Tratativas</h3>
             <div id="history-list"></div>
         </section>
 
@@ -408,95 +392,134 @@
         <a href="#" class="nav-item" onclick="switchTab('history')"><i>📋</i>Histórico</a>
     </nav>
 
-    <div id="modal" class="modal"><div id="modal-content" class="modal-content"></div></div>
+    <!-- Modal Base -->
+    <div id="modal" class="modal">
+        <div id="modal-content" class="modal-content"></div>
+    </div>
+
     <div id="toast"></div>
 
     <script>
-        // --- ESTADO E BANCO DE DADOS ---
+        // --- CONFIGURACOES E ESTADO ---
         const state = {
-            currentTab: 'home',
             products: [],
-            settings: { meta: 3.5, store: 'Águas Lindas' },
-            vendas: {}, // { '2026-04': { '2026-04-23': 5000 } }
-            fluigs: {}, // { '2026-04': [ {desc, valor, qtd} ] }
             history: [],
-            tratativa: { items: [createNewItem()], activeIdx: 0 },
+            vendas: {}, // { "2024-04": { "2024-04-21": 5000 } }
+            fluigs: {}, // { "2024-04": [{desc, valor, qtd}] }
+            settings: { meta: 3.5 },
+            tratativa: { items: [], activeIdx: 0 },
             currentDispatch: null
         };
 
         const DB = {
-            dbName: 'FLV_DB',
-            version: 1,
-            async init() {
+            init: () => {
                 return new Promise((res, rej) => {
-                    const req = indexedDB.open(this.dbName, this.version);
+                    const req = indexedDB.open('FLV_DB', 5);
                     req.onupgradeneeded = e => {
                         const db = e.target.result;
-                        if (!db.objectStoreNames.contains('data')) db.createObjectStore('data');
+                        if (!db.objectStoreNames.contains('products')) db.createObjectStore('products', { keyPath: 'id' });
                         if (!db.objectStoreNames.contains('history')) db.createObjectStore('history', { keyPath: 'id' });
+                        if (!db.objectStoreNames.contains('vendas')) db.createObjectStore('vendas', { keyPath: 'id' });
+                        if (!db.objectStoreNames.contains('fluigs')) db.createObjectStore('fluigs', { keyPath: 'id' });
+                        if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'id' });
                     };
-                    req.onsuccess = e => { this.db = e.target.result; res(); };
+                    req.onsuccess = e => { state.db = e.target.result; res(); };
                     req.onerror = e => rej(e);
                 });
             },
-            async save(key, val) {
-                const tx = this.db.transaction('data', 'readwrite');
-                tx.objectStore('data').put(val, key);
-                return new Promise(res => tx.oncomplete = res);
+            save: (store, data) => {
+                const tx = state.db.transaction(store, 'readwrite');
+                if (store === 'vendas' || store === 'fluigs' || store === 'settings') {
+                    tx.objectStore(store).put({ id: 'main', data });
+                } else {
+                    tx.objectStore(store).clear();
+                    data.forEach(item => tx.objectStore(store).add(item));
+                }
             },
-            async load(key) {
-                const tx = this.db.transaction('data', 'readonly');
-                const req = tx.objectStore('data').get(key);
-                return new Promise(res => req.onsuccess = () => res(req.result));
+            load: (store) => {
+                return new Promise(res => {
+                    const tx = state.db.transaction(store, 'readonly');
+                    const req = tx.objectStore(store).getAll();
+                    req.onsuccess = () => {
+                        if (store === 'vendas' || store === 'fluigs' || store === 'settings') {
+                            res(req.result[0] ? req.result[0].data : (store === 'settings' ? {meta: 3.5} : {}));
+                        } else res(req.result);
+                    };
+                });
             },
-            async saveTratativa(record) {
-                const tx = this.db.transaction('history', 'readwrite');
-                tx.objectStore('history').put(record);
-                return new Promise(res => tx.oncomplete = res);
+            saveTratativa: (record) => {
+                const tx = state.db.transaction('history', 'readwrite');
+                tx.objectStore('history').add(record);
             },
-            async loadHistory() {
-                const tx = this.db.transaction('history', 'readonly');
-                const req = tx.objectStore('history').getAll();
-                return new Promise(res => req.onsuccess = () => res(req.result.sort((a,b)=>b.timestamp - a.timestamp)));
-            },
-            async deleteHistory(id) {
-                const tx = this.db.transaction('history', 'readwrite');
+            deleteHistory: (id) => {
+                const tx = state.db.transaction('history', 'readwrite');
                 tx.objectStore('history').delete(id);
-                return new Promise(res => tx.oncomplete = res);
+            },
+            loadHistory: () => {
+                return new Promise(res => {
+                    const tx = state.db.transaction('history', 'readonly');
+                    const req = tx.objectStore('history').getAll();
+                    req.onsuccess = () => res(req.result.sort((a,b) => b.timestamp - a.timestamp));
+                });
             }
         };
 
+        // --- UTILITARIOS ---
+        function formatCurrency(v) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0); }
+        function formatDate(d) { if(!d) return ''; const [y,m,day] = d.split('-'); return `${day}/${m}/${y}`; }
+        function formatMonth(m) { const [y,mo] = m.split('-'); const date = new Date(y, mo-1); return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase(); }
+        function parseMoney(v) { if (!v) return 0; return parseFloat(v.replace(/\./g, '').replace(',', '.')) || 0; }
+        function maskMoney(i) {
+            let v = i.value.replace(/\D/g, '');
+            v = (v/100).toFixed(2).replace('.', ',');
+            v = v.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            i.value = v;
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
         function createNewItem() {
             return {
-                productId: '', productName: '', productCode: '', unit: 'kg', price: 0,
-                date: new Date().toISOString().split('T')[0], arrived: '', loss: '',
+                productId: '', productName: '', productCode: '',
+                date: new Date().toISOString().split('T')[0],
+                arrived: '', loss: '', unit: 'kg', price: 0,
                 photos: { produto: [], balanca: [], etiqueta: [] }
             };
         }
 
-        window.onload = async () => { initSplash(); await DB.init(); await loadAllData(); renderAll(); setupServiceWorker(); };
+        // --- INICIALIZACAO ---
+        window.onload = async () => {
+            await DB.init();
+            state.products = await DB.load('products');
+            state.history = await DB.loadHistory();
+            state.vendas = await DB.load('vendas');
+            state.fluigs = await DB.load('fluigs');
+            state.settings = await DB.load('settings');
+            state.tratativa.items = [createNewItem()];
+            renderHome();
+            initSplash();
+        };
 
         function initSplash() {
-            const canvas = document.getElementById('splashCanvas'); const ctx = canvas.getContext('2d');
-            canvas.width = 200; canvas.height = 200;
-            ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(100, 100, 80, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#1c4a1c'; ctx.font = 'bold 80px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('F', 100, 130);
+            const canvas = document.getElementById('splashCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            ctx.fillStyle = 'rgba(255,255,255,0.1)';
+            for(let i=0; i<50; i++) {
+                ctx.beginPath();
+                ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*5, 0, Math.PI*2);
+                ctx.fill();
+            }
         }
 
         function hideSplash() { document.getElementById('splash').style.display = 'none'; }
 
-        async function loadAllData() {
-            state.products = await DB.load('products') || [];
-            state.settings = await DB.load('settings') || { meta: 3.5, store: 'Águas Lindas' };
-            state.vendas = await DB.load('vendas') || {};
-            state.fluigs = await DB.load('fluigs') || {};
-            state.history = await DB.loadHistory();
-        }
-
-        function renderAll() { renderHome(); renderProducts(); renderNewTratativa(); renderDashboard(); renderHistory(); }
-
         function switchTab(tabId) {
-            state.currentTab = tabId;
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-' + tabId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -506,8 +529,13 @@
             if (tabId === 'new-tratativa') navItems[2].classList.add('active');
             if (tabId === 'dashboard') navItems[3].classList.add('active');
             if (tabId === 'history') navItems[4].classList.add('active');
+            
             if (tabId === 'dashboard') loadDashboard();
             if (tabId === 'home') renderHome();
+            if (tabId === 'products') renderProducts();
+            if (tabId === 'new-tratativa') renderNewTratativa();
+            if (tabId === 'history') renderHistory();
+            if (tabId === 'dispatch') renderDispatch();
         }
 
         // --- LOGICA PRODUTOS ---
@@ -706,51 +734,64 @@
             }).join('\n\n');
         }
 
-        // --- TELA DE DESPACHO ---
-        function renderDispatch() {
-            const d = state.currentDispatch; if (!d) return;
-            document.getElementById('dispatch-text-preview').innerText = d.text;
-            const container = document.getElementById('dispatch-media-container');
-            container.innerHTML = '';
-            d.items.forEach((item, itemIdx) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'card';
-                itemDiv.innerHTML = `<h4 style="color:var(--primary-green)">${item.productName}</h4>`;
-                ['produto', 'balanca', 'etiqueta'].forEach(type => {
-                    if (item.photos[type].length) {
-                        const sec = document.createElement('div');
-                        sec.className = 'dispatch-media-section';
-                        sec.innerHTML = `<div class="dispatch-media-title">FOTOS ${type.toUpperCase()}</div>`;
-                        item.photos[type].forEach((src, pIdx) => {
-                            const pItem = document.createElement('div');
-                            pItem.className = 'dispatch-photo-item';
-                            pItem.innerHTML = `<img src="${src}"><div class="dispatch-photo-actions"><button class="btn btn-primary btn-block" onclick="shareMedia('${src}', 'foto_${type}_${pIdx}.jpg')">Compartilhar Foto</button></div>`;
-                            sec.appendChild(pItem);
-                        });
-                        itemDiv.appendChild(sec);
-                    }
-                });
-                container.appendChild(itemDiv);
-            });
-        }
-
-        function dispatchWhatsAppText() {
-            const text = encodeURIComponent(state.currentDispatch.text);
-            window.location.href = `https://api.whatsapp.com/send?text=${text}`;
-        }
-
-        async function shareMedia(base64, filename) {
-            const blob = await (await fetch(base64)).blob();
-            const file = new File([blob], filename, { type: 'image/jpeg' });
-            if (navigator.share && navigator.canShare({ files: [file] })) {
-                navigator.share({ files: [file] }).catch(() => showToast('Erro ao compartilhar'));
-            } else {
-                const a = document.createElement('a'); a.href = base64; a.download = filename; a.click();
-                showToast('Download iniciado (seu celular não suporta compartilhamento direto)');
+        function resetTratativa() {
+            if (confirm('Limpar toda a tratativa atual?')) {
+                state.tratativa = { items: [createNewItem()], activeIdx: 0 };
+                renderNewTratativa();
             }
         }
 
+        // --- DISPATCH ---
+        function renderDispatch() {
+            const d = state.currentDispatch; if (!d) return;
+            document.getElementById('dispatch-text').value = d.text;
+            const mediaList = document.getElementById('dispatch-media-list');
+            mediaList.innerHTML = '';
+            d.items.forEach((item, i) => {
+                ['produto', 'balanca', 'etiqueta'].forEach(type => {
+                    item.photos[type].forEach((src, idx) => {
+                        const div = document.createElement('div');
+                        div.className = 'card';
+                        div.innerHTML = `
+                            <p style="font-size:0.7rem; font-weight:700; margin-bottom:5px; color:var(--primary-green)">${item.productName} - ${type.toUpperCase()} (${idx+1})</p>
+                            <img src="${src}" style="width:100%; border-radius:8px; margin-bottom:10px;">
+                            <button class="btn btn-outline btn-block" onclick="shareMedia('${src}', '${item.productName}_${type}')">📤 Compartilhar Foto</button>
+                        `;
+                        mediaList.appendChild(div);
+                    });
+                });
+            });
+        }
+
+        function sendToWhatsAppText() {
+            const text = encodeURIComponent(state.currentDispatch.text);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
+
+        async function shareMedia(base64, filename) {
+            try {
+                const blob = await (await fetch(base64)).blob();
+                const file = new File([blob], filename + '.jpg', { type: 'image/jpeg' });
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: 'Foto Tratativa' });
+                } else {
+                    const link = document.createElement('a');
+                    link.href = base64; link.download = filename + '.jpg'; link.click();
+                    showToast('Compartilhamento não suportado. Foto baixada.');
+                }
+            } catch (e) { showToast('Erro ao compartilhar'); }
+        }
+
         // --- DASHBOARD ---
+        function getAvailableMonths() {
+            const ms = new Set();
+            state.history.forEach(h => ms.add(h.date.substring(0, 7)));
+            for (let m in state.vendas) ms.add(m);
+            for (let m in state.fluigs) ms.add(m);
+            const now = new Date().toISOString().substring(0, 7); ms.add(now);
+            return Array.from(ms).sort().reverse();
+        }
+
         function renderDashboard() { const sel = document.getElementById('dash-month-selector'); const ms = getAvailableMonths(); sel.innerHTML = ms.map(m => `<option value="${m}">${formatMonth(m)}</option>`).join(''); loadDashboard(); }
         
         function loadDashboard() {
@@ -765,6 +806,7 @@
             document.getElementById('dash-proj-text').innerText = `${formatCurrency(s.quebraBruta)} / ${formatCurrency(s.projecao)}`;
             document.getElementById('dash-perc-val').innerText = Math.abs(s.percPerdaTotal).toFixed(2).replace('.', ',') + '%';
             document.getElementById('dash-meta-val').innerText = state.settings.meta.toString().replace('.', ',');
+            document.getElementById('dash-meta-progress').style.width = Math.min(100, (Math.abs(s.percPerdaTotal) / state.settings.meta) * 100) + '%';
             renderEvolutionTable(m);
         }
 
@@ -881,6 +923,7 @@
         async function saveProduct(id) {
             const name = document.getElementById('m-p-name').value, code = document.getElementById('m-p-code').value;
             if (!name || !code) return showToast('Preencha tudo!');
+            if (!id && state.products.find(p => p.code === code && !p.deleted)) return showToast('Código já cadastrado!');
             if (id) { const idx = state.products.findIndex(p => p.id === id); state.products[idx] = { ...state.products[idx], name, code }; }
             else { state.products.push({ id: Date.now()+'', name, code, unit: 'kg', price: 0, deleted: false }); }
             DB.save('products', state.products); closeModal(); renderProducts();
@@ -912,49 +955,37 @@
                     ${fluigs.map((f, i) => `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; font-size:0.8rem;"><span>${f.desc} (${f.qtd})</span><span>${formatCurrency(f.valor)} <button onclick="deleteFluig(${i})" style="color:var(--danger); border:none; background:none; cursor:pointer; margin-left:10px;">🗑️</button></span></div>`).join('') || '<p style="font-size:0.8rem; color:#999;">Nenhum ajuste.</p>'}
                 </div>
                 <div class="form-group"><label>Produto</label><input type="text" id="m-f-desc" placeholder="Ex: Banana"></div>
-                <div class="form-group"><label>Quantidade</label><input type="text" id="m-f-qtd" placeholder="Ex: 60kg"></div>
-                <div class="form-group"><label>Valor R$</label><input type="text" id="m-f-val" placeholder="0,00" oninput="maskMoney(this)"></div>
-                <button class="btn btn-primary btn-block" onclick="saveFluig()">Salvar Fluig</button>`;
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group"><label>Quantidade</label><input type="number" id="m-f-qtd" value="1" oninput="updateFluigTotal()"></div>
+                    <div class="form-group"><label>Valor Unitário</label><input type="text" id="m-f-unit" placeholder="0,00" oninput="maskMoney(this); updateFluigTotal()"></div>
+                </div>
+                <div class="form-group"><label>Valor Total do Ajuste</label><input type="text" id="m-f-total" value="R$ 0,00" readonly style="background:#f0f0f0; font-weight:700;"></div>
+                <button class="btn btn-primary btn-block" onclick="saveFluig()">Salvar Ajuste</button>`;
             modal.style.display = 'flex';
         }
-        function saveFluig() {
-            const m = document.getElementById('dash-month-selector').value, d = document.getElementById('m-f-desc').value, q = document.getElementById('m-f-qtd').value, v = parseMoney(document.getElementById('m-f-val').value);
-            if (!d || !v) return showToast('Preencha Produto e Valor!');
-            if (!state.fluigs[m]) state.fluigs[m] = [];
-            state.fluigs[m].push({ desc: d, qtd: q, valor: v });
-            DB.save('fluigs', state.fluigs); showFluigModal(); loadDashboard();
+
+        function updateFluigTotal() {
+            const qtd = parseFloat(document.getElementById('m-f-qtd').value) || 0;
+            const unit = parseMoney(document.getElementById('m-f-unit').value);
+            document.getElementById('m-f-total').value = formatCurrency(qtd * unit);
         }
+
+        function saveFluig() {
+            const m = document.getElementById('dash-month-selector').value;
+            const desc = document.getElementById('m-f-desc').value;
+            const qtd = parseFloat(document.getElementById('m-f-qtd').value) || 0;
+            const valor = parseMoney(document.getElementById('m-f-unit').value) * qtd;
+            if (!desc || valor <= 0) return showToast('Preencha os dados!');
+            if (!state.fluigs[m]) state.fluigs[m] = [];
+            state.fluigs[m].push({ desc, valor, qtd });
+            DB.save('fluigs', state.fluigs); closeModal(); loadDashboard();
+        }
+
         function deleteFluig(idx) {
             const m = document.getElementById('dash-month-selector').value;
             state.fluigs[m].splice(idx, 1);
             DB.save('fluigs', state.fluigs); showFluigModal(); loadDashboard();
         }
-
-        function showMetaModal() {
-            const modal = document.getElementById('modal'); const content = document.getElementById('modal-content');
-            content.innerHTML = `<div class="modal-header"><h3>Editar Meta %</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Meta Mensal (%)</label><input type="number" step="0.1" id="m-meta" value="${state.settings.meta}"></div><button class="btn btn-primary btn-block" onclick="saveMeta()">Salvar Meta</button>`;
-            modal.style.display = 'flex';
-        }
-        function saveMeta() { state.settings.meta = parseFloat(document.getElementById('m-meta').value || 3.5); DB.save('settings', state.settings); closeModal(); loadDashboard(); renderHome(); }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
-        function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
-        function formatCurrency(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); }
-        function formatDate(d) { const p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
-        function formatMonth(m) { const p = m.split('-'); const ms = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; return `${ms[parseInt(p[1])-1]}/${p[0]}`; }
-        function getAvailableMonths() { const ms = new Set(); ms.add(new Date().toISOString().substring(0,7)); state.history.forEach(h => ms.add(h.date.substring(0,7))); return Array.from(ms).sort().reverse(); }
-        function setupServiceWorker() { if ('serviceWorker' in navigator) { const blob = new Blob(['self.addEventListener("fetch", e => e.respondWith(fetch(e.request)))'], { type: 'application/javascript' }); navigator.serviceWorker.register(URL.createObjectURL(blob)); } }
-        
-        function maskMoney(input) {
-            let v = input.value.replace(/\D/g, '');
-            v = (v / 100).toFixed(2).replace('.', ',');
-            v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-            input.value = v;
-        }
-        function parseMoney(v) {
-            if (!v) return 0;
-            return parseFloat(v.replace(/\./g, '').replace(',', '.'));
-        }
-        function resetTratativa() { if(confirm('Limpar tudo?')) { state.tratativa = { items: [createNewItem()], activeIdx: 0 }; renderNewTratativa(); } }
     </script>
 </body>
 </html>
