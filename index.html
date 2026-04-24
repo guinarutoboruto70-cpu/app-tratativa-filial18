@@ -159,7 +159,7 @@
         <h1 class="mono">FLV Controle</h1>
         <p>QUEBRA DE HORTIFRUTI</p>
         <button class="btn-enter" onclick="hideSplash()">Entrar no App</button>
-        <div class="footer-credit">Powered by William Jesus</div>
+        <div class="footer-credit" style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">Powered by William Jesus</div>
     </div>
 
     <header>
@@ -249,55 +249,57 @@
                 </div>
 
                 <div class="form-group">
-                    <label>PREÇO DE VENDA (HOJE)</label>
-                    <div style="position: relative;">
-                        <span style="position: absolute; left: 10px; top: 12px; font-weight: 700;">R$</span>
-                        <input type="text" id="t-price-today" style="padding-left: 35px;" oninput="maskMoney(this); updateInternalLossPerc()">
-                    </div>
+                    <label>Preço de Venda (Hoje)</label>
+                    <input type="text" id="t-price-today" placeholder="0,00" oninput="maskMoney(this); updateInternalLossPerc()">
                 </div>
 
-                <div style="margin: 10px 0;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
-                        <span>% Quebra do Item</span>
-                        <span id="t-internal-perc" style="font-weight: 700;">0,0%</span>
-                    </div>
-                    <div class="meta-bar"><div id="t-internal-progress" class="meta-progress" style="width: 0%"></div></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span style="font-size: 0.8rem; font-weight: 700;">% Quebra do Item</span>
+                    <span id="t-internal-perc" style="font-weight: 800; color: var(--primary-green);">0,0%</span>
+                </div>
+                <div class="meta-bar"><div id="t-internal-progress" class="meta-progress" style="width: 0%"></div></div>
+            </div>
+
+            <div class="card">
+                <h3>📷 FOTOS DO PRODUTO (VÁRIAS)</h3>
+                <div class="photo-grid" id="p-produto-grid"></div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-outline btn-block" onclick="captureMedia('produto', 'camera')">📷 Camera</button>
+                    <button class="btn btn-outline btn-block" onclick="captureMedia('produto', 'gallery')">🖼️ Galeria</button>
                 </div>
             </div>
 
             <div class="card">
-                <label>📷 FOTOS DO PRODUTO (GALERIA)</label>
-                <button class="btn btn-outline btn-block" onclick="captureMedia('produto', 'gallery')">🖼️ Selecionar Fotos</button>
-                <div id="p-produto-grid" class="photo-grid"></div>
+                <h3>⚖️ FOTOS DA BALANÇA (VÁRIAS)</h3>
+                <div class="photo-grid" id="p-balanca-grid"></div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-outline btn-block" onclick="captureMedia('balanca', 'camera')">📷 Camera</button>
+                    <button class="btn btn-outline btn-block" onclick="captureMedia('balanca', 'gallery')">🖼️ Galeria</button>
+                </div>
             </div>
 
             <div class="card">
-                <label>⚖️ FOTOS DA BALANÇA (GALERIA)</label>
-                <button class="btn btn-outline btn-block" onclick="captureMedia('balanca', 'gallery')">🖼️ Selecionar Fotos</button>
-                <div id="p-balanca-grid" class="photo-grid"></div>
+                <h3>🏷️ FOTO DA ETIQUETA (APENAS 1)</h3>
+                <div class="photo-grid" id="p-etiqueta-grid"></div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-outline btn-block" onclick="captureMedia('etiqueta', 'camera')">📷 Camera</button>
+                    <button class="btn btn-outline btn-block" onclick="captureMedia('etiqueta', 'gallery')">🖼️ Galeria</button>
+                </div>
             </div>
 
-            <div class="card">
-                <label>🏷️ FOTO DA ETIQUETA (CÂMERA)</label>
-                <button class="btn btn-outline btn-block" onclick="captureMedia('etiqueta', 'camera')">📷 Tirar Foto</button>
-                <div id="p-etiqueta-grid" class="photo-grid"></div>
-            </div>
+            <input type="file" id="media-input-camera" accept="image/*" capture="environment" class="hidden" onchange="processMedia(this)" multiple>
+            <input type="file" id="media-input-gallery" accept="image/*" class="hidden" onchange="processMedia(this)" multiple>
 
-            <input type="file" id="media-input-camera" accept="image/*" capture="environment" class="hidden" onchange="processMedia(this)">
-            <input type="file" id="media-input-gallery" accept="image/*" multiple class="hidden" onchange="processMedia(this)">
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-                <button class="btn btn-outline" onclick="resetTratativa()">Limpar</button>
-                <button class="btn btn-primary" onclick="saveAndGoToDispatch()">Salvar Tratativa</button>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 20px;">
+                <button class="btn btn-outline" onclick="resetTratativa()">🗑️ Limpar</button>
+                <button class="btn btn-primary" onclick="saveAndGoToDispatch()">💾 Salvar Tratativa</button>
             </div>
         </section>
 
-        <!-- TELA DESPACHO (NOVA) -->
+        <!-- TELA DESPACHO (ENVIO WHATSAPP) -->
         <section id="screen-dispatch" class="screen">
             <div class="card">
-                <h3 style="color: var(--primary-green); margin-bottom: 10px;">Tratativa Salva!</h3>
-                <p style="font-size: 0.9rem; margin-bottom: 15px;">A tratativa foi gravada com sucesso. Siga a ordem abaixo para enviar ao WhatsApp:</p>
-                
+                <h2 style="margin-bottom: 15px;">Enviar Tratativa</h2>
                 <div class="form-group">
                     <label>Texto da Tratativa</label>
                     <textarea id="dispatch-text" style="height: 150px; font-size: 0.85rem; background: #f9f9f9;" readonly></textarea>
@@ -468,7 +470,7 @@
         function formatCurrency(v) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0); }
         function formatDate(d) { if(!d) return ''; const [y,m,day] = d.split('-'); return `${day}/${m}/${y}`; }
         function formatMonth(m) { const [y,mo] = m.split('-'); const date = new Date(y, mo-1); return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase(); }
-        function parseMoney(v) { if (!v) return 0; return parseFloat(v.replace(/\./g, '').replace(',', '.')) || 0; }
+        function parseMoney(v) { if (!v) return 0; if (typeof v === 'number') return v; return parseFloat(v.replace(/\./g, '').replace(',', '.')) || 0; }
         function maskMoney(i) {
             let v = i.value.replace(/\D/g, '');
             v = (v/100).toFixed(2).replace('.', ',');
