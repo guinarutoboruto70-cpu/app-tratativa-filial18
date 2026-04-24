@@ -4,388 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FLV Controle - Quebra de Hortifruti</title>
-    
-    <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FLV Controle">
     <meta name="theme-color" content="#1c4a1c">
-    
-    <!-- PWA Manifest Inline -->
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZMViBDb250cm9sZSIsCiAgInNob3J0X25hbWUiOiAiRkxWIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxYzRhMWMiLAogICJ0aGVtZV9jb2xvciI6ICIjMWM0YTFjIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS81MTIvNDI2NC80MjY0NjgxLnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgogICAgfQogIF0KfQ==">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4264/4264681.png">
-    
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
-    
-    <!-- Tesseract.js for OCR -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
     <style>
-        :root {
-            --header-bg: #1c4a1c;
-            --primary-green: #2d6a2d;
-            --bg-color: #eef2eb;
-            --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --danger: #d32f2f;
-            --success: #2e7d32;
-            --shadow: 0 4px 12px rgba(0,0,0,0.08);
-            --border-radius: 14px;
-        }
-
+        :root { --header-bg: #1c4a1c; --primary-green: #2d6a2d; --bg-color: #eef2eb; --card-bg: #ffffff; --text-main: #333333; --text-muted: #666666; --danger: #d32f2f; --success: #2e7d32; --shadow: 0 4px 12px rgba(0,0,0,0.08); --border-radius: 14px; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.5;
-            overflow-x: hidden;
-            padding-bottom: 80px;
-        }
-
+        body { font-family: 'Nunito', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; overflow-x: hidden; padding-bottom: 80px; }
         .mono { font-family: 'Source Code Pro', monospace; }
-
-        /* Splash Screen */
-        #splash {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #1c4a1c 0%, #2d6a2d 100%);
-            z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center;
-        }
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1c4a1c 0%, #2d6a2d 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
         #splash h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        #splash .btn-enter {
-            background: white; color: var(--header-bg); border: none; padding: 12px 40px; border-radius: 30px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        /* Header */
-        header {
-            background-color: var(--header-bg); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100;
-            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        /* Bottom Nav */
-        nav.bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: white; height: 70px;
-            display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; padding: 0 10px;
-        }
+        #splash .btn-enter { background: white; color: var(--header-bg); border: none; padding: 12px 40px; border-radius: 30px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        header { background-color: var(--header-bg); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        nav.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; padding: 0 10px; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 0.7rem; flex: 1; }
         .nav-item.active { color: var(--primary-green); font-weight: 700; }
         .nav-item i { font-size: 1.4rem; margin-bottom: 4px; font-style: normal; }
-        .nav-center {
-            position: relative; top: -20px; background: var(--primary-green); width: 60px; height: 60px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(45, 106, 45, 0.4); border: 5px solid var(--bg-color); font-size: 24px;
-        }
-
-        /* Screens */
+        .nav-center { position: relative; top: -20px; background: var(--primary-green); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(45, 106, 45, 0.4); border: 5px solid var(--bg-color); font-size: 24px; }
         .screen { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Common Components */
         .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow); }
         .btn { border: none; border-radius: 8px; padding: 10px 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn:active { opacity: 0.7; }
         .btn-primary { background: var(--primary-green); color: white; }
         .btn-outline { border: 1px solid var(--primary-green); color: var(--primary-green); background: transparent; }
         .btn-block { width: 100%; }
-
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
         .badge-success { background: #e8f5e9; color: var(--success); }
         .badge-danger { background: #ffebee; color: var(--danger); }
-
-        /* Form Controls */
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; font-family: inherit; }
-        input:focus { border-color: var(--primary-green); outline: none; }
-
         .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
         .summary-card { text-align: center; }
         .summary-card .value { font-size: 1.4rem; font-weight: 700; display: block; }
         .summary-card .label { font-size: 0.75rem; color: var(--text-muted); }
-
         .meta-bar { height: 8px; background: #ddd; border-radius: 4px; overflow: hidden; margin: 10px 0; }
         .meta-progress { height: 100%; background: var(--primary-green); transition: width 0.5s ease; }
-
-        /* Products Screen */
         .product-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
-        .product-item:last-child { border-bottom: none; }
-        .product-info h4 { font-size: 1rem; margin-bottom: 2px; }
-        .product-info p { font-size: 0.8rem; color: var(--text-muted); }
-
-        /* Autocomplete */
-        .autocomplete-results {
-            background: white; border: 1px solid #ddd; border-top: none; max-height: 200px; overflow-y: auto; position: absolute; width: calc(100% - 40px); z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+        .autocomplete-results { background: white; border: 1px solid #ddd; border-top: none; max-height: 200px; overflow-y: auto; position: absolute; width: calc(100% - 40px); z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .autocomplete-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .autocomplete-item:active { background: #f5f5f5; }
-
         .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-        .photo-box { 
-            aspect-ratio: 1/1; background: #f0f0f0; border: 2px dashed #ccc; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; color: #888; position: relative; overflow: hidden;
-        }
+        .photo-box { aspect-ratio: 1/1; background: #f0f0f0; border: 2px dashed #ccc; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; color: #888; position: relative; overflow: hidden; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
         .photo-box .remove-btn { position: absolute; top: 2px; right: 2px; background: rgba(211, 47, 47, 0.8); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 5; }
-
-        /* Modal */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: white; border-radius: var(--border-radius); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 20px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        
-        /* Toast */
         #toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; z-index: 3000; display: none; }
-
         .hidden { display: none !important; }
         .text-center { text-align: center; }
         .mt-10 { margin-top: 10px; }
         .mb-10 { margin-bottom: 10px; }
-
-        /* Dispatch Screen Styles */
-        .dispatch-media-section { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
-        .dispatch-media-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; color: var(--primary-green); }
-        .dispatch-photo-item { position: relative; margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
-        .dispatch-photo-item img { width: 100%; display: block; }
-        .dispatch-photo-actions { display: flex; gap: 5px; padding: 5px; background: #f9f9f9; }
     </style>
 </head>
 <body>
-
     <div id="splash">
-        <canvas id="splashCanvas"></canvas>
-        <h1 class="mono">FLV Controle</h1>
+        <h1>FLV Controle</h1>
         <p>QUEBRA DE HORTIFRUTI</p>
         <button class="btn-enter" onclick="hideSplash()">Entrar no App</button>
-        <div class="footer-credit" style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">Powered by William Jesus</div>
+        <div style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">Powered by William Jesus</div>
     </div>
-
     <header>
         <div style="font-weight: 700; font-size: 1.2rem;">FLV Controle</div>
         <div id="currentStore" style="font-size: 0.8rem; opacity: 0.8;">Águas Lindas</div>
     </header>
-
     <main id="app">
-        
-        <!-- TELA HOME -->
         <section id="screen-home" class="screen active">
             <div class="summary-grid">
-                <div class="card summary-card">
-                    <span class="label">Tratativas (Hoje)</span>
-                    <span class="value mono" id="home-today-count">0</span>
-                </div>
-                <div class="card summary-card">
-                    <span class="label">Valor em Quebra</span>
-                    <span class="value mono" id="home-total-bruta">R$ 0,00</span>
-                </div>
-                <div class="card summary-card">
-                    <span class="label">% Quebra</span>
-                    <span class="value mono" id="home-perc-quebra">0,0%</span>
-                </div>
-                <div class="card summary-card">
-                    <span class="label">Status</span>
-                    <span id="home-status-badge" class="badge badge-success">BOM</span>
-                </div>
+                <div class="card summary-card"><span class="label">Tratativas (Hoje)</span><span class="value mono" id="home-today-count">0</span></div>
+                <div class="card summary-card"><span class="label">Valor em Quebra</span><span class="value mono" id="home-total-bruta">R$ 0,00</span></div>
+                <div class="card summary-card"><span class="label">% Quebra</span><span class="value mono" id="home-perc-quebra">0,0%</span></div>
+                <div class="card summary-card"><span class="label">Status</span><span id="home-status-badge" class="badge badge-success">BOM</span></div>
             </div>
-
-            <div class="card">
-                <h3>Progresso Meta (3,5%)</h3>
-                <div class="meta-bar"><div id="home-meta-progress" class="meta-progress" style="width: 0%"></div></div>
-            </div>
-
-            <h3 class="mb-10">Recentes</h3>
-            <div id="home-recent-list"></div>
+            <div class="card"><h3>Progresso Meta (3,5%)</h3><div class="meta-bar"><div id="home-meta-progress" class="meta-progress" style="width: 0%"></div></div></div>
+            <h3 class="mb-10">Recentes</h3><div id="home-recent-list"></div>
         </section>
-
-        <!-- TELA PRODUTOS -->
         <section id="screen-products" class="screen">
             <div class="card">
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <input type="text" id="product-search" placeholder="Buscar código ou nome..." oninput="filterProductsList()">
-                    <button class="btn btn-primary" onclick="showProductModal()">➕</button>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-outline btn-block" onclick="triggerOCR('camera')">📷 Nota</button>
-                    <button class="btn btn-outline btn-block" onclick="triggerOCR('gallery')">🖼️ Nota</button>
-                </div>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;"><input type="text" id="product-search" placeholder="Buscar código ou nome..." oninput="filterProductsList()"><button class="btn btn-primary" onclick="showProductModal()">➕</button></div>
+                <div style="display: flex; gap: 10px;"><button class="btn btn-outline btn-block" onclick="triggerOCR('camera')">📷 Nota</button><button class="btn btn-outline btn-block" onclick="triggerOCR('gallery')">🖼️ Nota</button></div>
                 <input type="file" id="ocr-input-camera" accept="image/*" capture="environment" class="hidden" onchange="handleOCR(this)">
                 <input type="file" id="ocr-input-gallery" accept="image/*" class="hidden" onchange="handleOCR(this)">
             </div>
-
-            <div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between;">
-                <span>Lista de Produtos</span>
-                <span>Total: <b id="product-total-counter">0</b></span>
-            </div>
+            <div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between;"><span>Lista de Produtos</span><span>Total: <b id="product-total-counter">0</b></span></div>
             <div id="product-list"></div>
         </section>
-
-        <!-- TELA NOVA TRATATIVA -->
         <section id="screen-new-tratativa" class="screen">
             <div id="tratativa-tabs" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px;"></div>
-
             <div class="card">
-                <div class="form-group">
-                    <label>PRODUTO *</label>
-                    <input type="text" id="t-product-input" placeholder="Buscar por nome ou código..." oninput="handleProductAutocomplete(this)">
-                    <div id="t-autocomplete-results" class="autocomplete-results hidden"></div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
-                    <div class="form-group"><label>DATA</label><input type="date" id="t-date" onchange="updateInternalLossPerc()"></div>
-                    <div class="form-group">
-                        <label>UNIDADE</label>
-                        <select id="t-unit-select" onchange="updateItemUnit(this.value)">
-                            <option value="kg">kg</option>
-                            <option value="un">un</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div class="form-group"><label>CHEGOU (<span class="t-unit-label">kg</span>)</label><input type="number" id="t-arrived" step="0.01" oninput="updateInternalLossPerc()"></div>
-                    <div class="form-group"><label>QUEBRA (<span class="t-unit-label">kg</span>)</label><input type="number" id="t-loss" step="0.01" oninput="updateInternalLossPerc()"></div>
-                </div>
-
-                <div class="form-group">
-                    <label>Preço de Venda (Hoje)</label>
-                    <input type="text" id="t-price-today" placeholder="0,00" oninput="maskMoney(this); updateInternalLossPerc()">
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <span style="font-size: 0.8rem; font-weight: 700;">% Quebra do Item</span>
-                    <span id="t-internal-perc" style="font-weight: 800; color: var(--primary-green);">0,0%</span>
-                </div>
+                <div class="form-group"><label>PRODUTO *</label><input type="text" id="t-product-input" placeholder="Buscar por nome ou código..." oninput="handleProductAutocomplete(this)"><div id="t-autocomplete-results" class="autocomplete-results hidden"></div></div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;"><div class="form-group"><label>DATA</label><input type="date" id="t-date" onchange="updateInternalLossPerc()"></div><div class="form-group"><label>UNIDADE</label><select id="t-unit-select" onchange="updateItemUnit(this.value)"><option value="kg">kg</option><option value="un">un</option></select></div></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"><div class="form-group"><label>CHEGOU (<span class="t-unit-label">kg</span>)</label><input type="number" id="t-arrived" step="0.01" oninput="updateInternalLossPerc()"></div><div class="form-group"><label>QUEBRA (<span class="t-unit-label">kg</span>)</label><input type="number" id="t-loss" step="0.01" oninput="updateInternalLossPerc()"></div></div>
+                <div class="form-group"><label>Preço de Venda (Hoje)</label><input type="text" id="t-price-today" placeholder="0,00" oninput="maskMoney(this); updateInternalLossPerc()"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;"><span style="font-size: 0.8rem; font-weight: 700;">% Quebra do Item</span><span id="t-internal-perc" style="font-weight: 800; color: var(--primary-green);">0,0%</span></div>
                 <div class="meta-bar"><div id="t-internal-progress" class="meta-progress" style="width: 0%"></div></div>
             </div>
-
-            <div class="card">
-                <h3>📷 FOTOS DO PRODUTO (VÁRIAS)</h3>
-                <div class="photo-grid" id="p-produto-grid"></div>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="btn btn-outline btn-block" onclick="captureMedia('produto', 'camera')">📷 Camera</button>
-                    <button class="btn btn-outline btn-block" onclick="captureMedia('produto', 'gallery')">🖼️ Galeria</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>⚖️ FOTOS DA BALANÇA (VÁRIAS)</h3>
-                <div class="photo-grid" id="p-balanca-grid"></div>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="btn btn-outline btn-block" onclick="captureMedia('balanca', 'camera')">📷 Camera</button>
-                    <button class="btn btn-outline btn-block" onclick="captureMedia('balanca', 'gallery')">🖼️ Galeria</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>🏷️ FOTO DA ETIQUETA (APENAS 1)</h3>
-                <div class="photo-grid" id="p-etiqueta-grid"></div>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="btn btn-outline btn-block" onclick="captureMedia('etiqueta', 'camera')">📷 Camera</button>
-                    <button class="btn btn-outline btn-block" onclick="captureMedia('etiqueta', 'gallery')">🖼️ Galeria</button>
-                </div>
-            </div>
-
-            <input type="file" id="media-input-camera" accept="image/*" capture="environment" class="hidden" onchange="processMedia(this)" multiple>
-            <input type="file" id="media-input-gallery" accept="image/*" class="hidden" onchange="processMedia(this)" multiple>
-
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 20px;">
-                <button class="btn btn-outline" onclick="resetTratativa()">🗑️ Limpar</button>
-                <button class="btn btn-primary" onclick="saveAndGoToDispatch()">💾 Salvar Tratativa</button>
-            </div>
+            <div class="card"><h3>📷 FOTOS DO PRODUTO (VÁRIAS)</h3><div class="photo-grid" id="p-produto-grid"></div><div style="display: flex; gap: 10px; margin-top: 10px;"><button class="btn btn-outline btn-block" onclick="captureMedia('produto', 'camera')">📷 Camera</button><button class="btn btn-outline btn-block" onclick="captureMedia('produto', 'gallery')">🖼️ Galeria</button></div></div>
+            <div class="card"><h3>⚖️ FOTOS DA BALANÇA (VÁRIAS)</h3><div class="photo-grid" id="p-balanca-grid"></div><div style="display: flex; gap: 10px; margin-top: 10px;"><button class="btn btn-outline btn-block" onclick="captureMedia('balanca', 'camera')">📷 Camera</button><button class="btn btn-outline btn-block" onclick="captureMedia('balanca', 'gallery')">🖼️ Galeria</button></div></div>
+            <div class="card"><h3>🏷️ FOTO DA ETIQUETA (APENAS 1)</h3><div class="photo-grid" id="p-etiqueta-grid"></div><div style="display: flex; gap: 10px; margin-top: 10px;"><button class="btn btn-outline btn-block" onclick="captureMedia('etiqueta', 'camera')">📷 Camera</button><button class="btn btn-outline btn-block" onclick="captureMedia('etiqueta', 'gallery')">🖼️ Galeria</button></div></div>
+            <input type="file" id="media-input-camera" accept="image/*" capture="environment" class="hidden" onchange="processMedia(this)" multiple><input type="file" id="media-input-gallery" accept="image/*" class="hidden" onchange="processMedia(this)" multiple>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 20px;"><button class="btn btn-outline" onclick="resetTratativa()">🗑️ Limpar</button><button class="btn btn-primary" onclick="saveAndGoToDispatch()">💾 Salvar Tratativa</button></div>
         </section>
-
-        <!-- TELA DESPACHO (ENVIO WHATSAPP) -->
         <section id="screen-dispatch" class="screen">
-            <div class="card">
-                <h2 style="margin-bottom: 15px;">Enviar Tratativa</h2>
-                <div class="form-group">
-                    <label>Texto da Tratativa</label>
-                    <textarea id="dispatch-text" style="height: 150px; font-size: 0.85rem; background: #f9f9f9;" readonly></textarea>
-                </div>
-                
-                <button class="btn btn-primary btn-block" onclick="sendToWhatsAppText()">1. Enviar Texto p/ WhatsApp</button>
-            </div>
-
-            <div class="card">
-                <h3>2. Enviar Fotos</h3>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Compartilhe cada foto abaixo na mesma conversa do WhatsApp:</p>
-                
-                <div id="dispatch-media-list"></div>
-                
-                <button class="btn btn-outline btn-block mt-10" onclick="switchTab('home')">Concluir e Voltar</button>
-            </div>
+            <div class="card"><h2>Enviar Tratativa</h2><div class="form-group"><label>Texto da Tratativa</label><textarea id="dispatch-text" style="height: 150px; font-size: 0.85rem; background: #f9f9f9;" readonly></textarea></div><button class="btn btn-primary btn-block" onclick="sendToWhatsAppText()">1. Enviar Texto p/ WhatsApp</button></div>
+            <div class="card"><h3>2. Enviar Fotos</h3><div id="dispatch-media-list"></div><button class="btn btn-outline btn-block mt-10" onclick="switchTab('home')">Concluir e Voltar</button></div>
         </section>
-
-        <!-- TELA DASHBOARD -->
         <section id="screen-dashboard" class="screen">
-            <div class="card text-center">
-                <select id="dash-month-selector" onchange="loadDashboard()" style="width: auto; margin-bottom: 10px; font-weight: 700;"></select>
-                <div id="dash-status-text" style="font-size: 1.5rem; font-weight: 800;">BOM</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">SITUAÇÃO ATUAL</p>
-            </div>
-
+            <div class="card text-center"><select id="dash-month-selector" onchange="loadDashboard()" style="width: auto; margin-bottom: 10px; font-weight: 700;"></select><div id="dash-status-text" style="font-size: 1.5rem; font-weight: 800;">BOM</div></div>
             <div class="summary-grid">
-                <div class="card summary-card" onclick="showVendaModal()" style="cursor: pointer; border: 1px solid #ddd;">
-                    <span class="label">VENDA TOTAL 📝</span>
-                    <span class="value mono" id="dash-vendas">R$ 0,00</span>
-                </div>
-                <div class="card summary-card">
-                    <span class="label">R$ QUEBRA BRUTA</span>
-                    <span class="value mono" id="dash-quebra-bruta">R$ 0,00</span>
-                </div>
-                <div class="card summary-card" onclick="showFluigModal()" style="cursor: pointer; border: 1px solid #ddd;">
-                    <span class="label">R$ PERDA (AJUSTES) 📝</span>
-                    <span class="value mono" id="dash-perda">R$ 0,00</span>
-                </div>
-                <div class="card summary-card">
-                    <span class="label">PERDA TOTAL CONCILIADA</span>
-                    <span class="value mono" id="dash-perda-total" style="color: var(--primary-green);">R$ 0,00</span>
-                </div>
+                <div class="card summary-card" onclick="showVendaModal()" style="cursor: pointer; border: 1px solid #ddd;"><span class="label">VENDA TOTAL 📝</span><span class="value mono" id="dash-vendas">R$ 0,00</span></div>
+                <div class="card summary-card"><span class="label">R$ QUEBRA BRUTA</span><span class="value mono" id="dash-quebra-bruta">R$ 0,00</span></div>
+                <div class="card summary-card" onclick="showFluigModal()" style="cursor: pointer; border: 1px solid #ddd;"><span class="label">R$ PERDA (AJUSTES) 📝</span><span class="value mono" id="dash-perda">R$ 0,00</span></div>
+                <div class="card summary-card"><span class="label">PERDA TOTAL CONCILIADA</span><span class="value mono" id="dash-perda-total" style="color: var(--primary-green);">R$ 0,00</span></div>
             </div>
-
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3>% Perda Total Conciliada</h3>
-                    <span id="dash-perc-val" style="font-size: 1.5rem; font-weight: 800; color: var(--primary-green);">0,00%</span>
-                </div>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Meta da Empresa: <span id="dash-meta-val">3,5</span>%</p>
-                <div class="meta-bar"><div id="dash-meta-progress" class="meta-progress" style="width: 0%"></div></div>
-            </div>
-
-            <div class="card">
-                <h3>Projeção do Mês (Quebra)</h3>
-                <p id="dash-proj-text" class="mono" style="font-size: 1.1rem; font-weight: 700;">R$ 0,00 / R$ 0,00</p>
-                <p style="font-size: 0.7rem; color: var(--text-muted);">Acumulado Atual / Estimativa Final</p>
-            </div>
-
-            <h3 class="mb-10">Evolução Diária e Impacto</h3>
-            <div class="card" style="padding: 0; overflow: hidden;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
-                    <thead>
-                        <tr style="background: #f0f0f0; text-align: left;">
-                            <th style="padding: 10px;">Data</th>
-                            <th>Venda</th>
-                            <th>Quebra</th>
-                            <th>% Dia</th>
-                            <th>Impacto</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dash-evolution-body"></tbody>
-                </table>
-            </div>
+            <div class="card"><div style="display: flex; justify-content: space-between; align-items: center;"><h3>% Perda Total</h3><span id="dash-perc-val" style="font-size: 1.5rem; font-weight: 800; color: var(--primary-green);">0,00%</span></div><div class="meta-bar"><div id="dash-meta-progress" class="meta-progress" style="width: 0%"></div></div></div>
+            <div class="card"><h3>Evolução Diária</h3><table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;"><thead><tr style="background: #f0f0f0;"><th style="padding: 10px;">Data</th><th>Venda</th><th>Quebra</th><th>%</th><th>Impacto</th><th>Ação</th></tr></thead><tbody id="dash-evolution-body"></tbody></table></div>
         </section>
-
-        <!-- TELA HISTÓRICO -->
-        <section id="screen-history" class="screen">
-            <h3 class="mb-10">Histórico de Tratativas</h3>
-            <div id="history-list"></div>
-        </section>
-
+        <section id="screen-history" class="screen"><div id="history-list"></div></section>
     </main>
-
     <nav class="bottom-nav">
         <a href="#" class="nav-item active" onclick="switchTab('home')"><i>🏠</i>Início</a>
         <a href="#" class="nav-item" onclick="switchTab('products')"><i>🏷️</i>Produtos</a>
@@ -393,37 +137,17 @@
         <a href="#" class="nav-item" onclick="switchTab('dashboard')"><i>📈</i>Dash</a>
         <a href="#" class="nav-item" onclick="switchTab('history')"><i>📋</i>Histórico</a>
     </nav>
-
-    <!-- Modal Base -->
-    <div id="modal" class="modal">
-        <div id="modal-content" class="modal-content"></div>
-    </div>
-
+    <div id="modal" class="modal"><div id="modal-content" class="modal-content"></div></div>
     <div id="toast"></div>
-
     <script>
-        // --- CONFIGURACOES E ESTADO ---
-        const state = {
-            products: [],
-            history: [],
-            vendas: {}, // { "2024-04": { "2024-04-21": 5000 } }
-            fluigs: {}, // { "2024-04": [{desc, valor, qtd}] }
-            settings: { meta: 3.5 },
-            tratativa: { items: [], activeIdx: 0 },
-            currentDispatch: null
-        };
-
+        const state = { products: [], history: [], vendas: {}, fluigs: {}, settings: { meta: 3.5 }, tratativa: { items: [], activeIdx: 0 }, currentDispatch: null };
         const DB = {
             init: () => {
                 return new Promise((res, rej) => {
-                    const req = indexedDB.open('FLV_DB', 5);
+                    const req = indexedDB.open('FLV_DB', 6);
                     req.onupgradeneeded = e => {
                         const db = e.target.result;
-                        if (!db.objectStoreNames.contains('products')) db.createObjectStore('products', { keyPath: 'id' });
-                        if (!db.objectStoreNames.contains('history')) db.createObjectStore('history', { keyPath: 'id' });
-                        if (!db.objectStoreNames.contains('vendas')) db.createObjectStore('vendas', { keyPath: 'id' });
-                        if (!db.objectStoreNames.contains('fluigs')) db.createObjectStore('fluigs', { keyPath: 'id' });
-                        if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'id' });
+                        ['products','history','vendas','fluigs','settings'].forEach(s => { if(!db.objectStoreNames.contains(s)) db.createObjectStore(s, {keyPath:'id'}); });
                     };
                     req.onsuccess = e => { state.db = e.target.result; res(); };
                     req.onerror = e => rej(e);
@@ -431,93 +155,45 @@
             },
             save: (store, data) => {
                 const tx = state.db.transaction(store, 'readwrite');
-                if (store === 'vendas' || store === 'fluigs' || store === 'settings') {
-                    tx.objectStore(store).put({ id: 'main', data });
-                } else {
-                    tx.objectStore(store).clear();
-                    data.forEach(item => tx.objectStore(store).add(item));
-                }
+                if (['vendas','fluigs','settings'].includes(store)) tx.objectStore(store).put({ id: 'main', data });
+                else { tx.objectStore(store).clear(); data.forEach(item => tx.objectStore(store).add(item)); }
             },
             load: (store) => {
                 return new Promise(res => {
                     const tx = state.db.transaction(store, 'readonly');
                     const req = tx.objectStore(store).getAll();
                     req.onsuccess = () => {
-                        if (store === 'vendas' || store === 'fluigs' || store === 'settings') {
-                            res(req.result[0] ? req.result[0].data : (store === 'settings' ? {meta: 3.5} : {}));
-                        } else res(req.result);
+                        if (['vendas','fluigs','settings'].includes(store)) res(req.result[0] ? req.result[0].data : (store==='settings'?{meta:3.5}:{}));
+                        else res(req.result);
                     };
                 });
             },
-            saveTratativa: (record) => {
-                const tx = state.db.transaction('history', 'readwrite');
-                tx.objectStore('history').add(record);
-            },
-            deleteHistory: (id) => {
-                const tx = state.db.transaction('history', 'readwrite');
-                tx.objectStore('history').delete(id);
-            },
-            loadHistory: () => {
-                return new Promise(res => {
-                    const tx = state.db.transaction('history', 'readonly');
-                    const req = tx.objectStore('history').getAll();
-                    req.onsuccess = () => res(req.result.sort((a,b) => b.timestamp - a.timestamp));
-                });
-            }
+            saveTratativa: (record) => { const tx = state.db.transaction('history', 'readwrite'); tx.objectStore('history').add(record); },
+            deleteHistory: (id) => { const tx = state.db.transaction('history', 'readwrite'); tx.objectStore('history').delete(id); },
+            loadHistory: () => { return new Promise(res => { const tx = state.db.transaction('history', 'readonly'); const req = tx.objectStore('history').getAll(); req.onsuccess = () => res(req.result.sort((a,b)=>b.timestamp-a.timestamp)); }); }
         };
 
-        // --- UTILITARIOS ---
         function formatCurrency(v) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0); }
         function formatDate(d) { if(!d) return ''; const [y,m,day] = d.split('-'); return `${day}/${m}/${y}`; }
         function formatMonth(m) { const [y,mo] = m.split('-'); const date = new Date(y, mo-1); return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase(); }
         function parseMoney(v) { if (!v) return 0; if (typeof v === 'number') return v; return parseFloat(v.replace(/\./g, '').replace(',', '.')) || 0; }
-        function maskMoney(i) {
-            let v = i.value.replace(/\D/g, '');
-            v = (v/100).toFixed(2).replace('.', ',');
-            v = v.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            i.value = v;
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3000);
-        }
-
+        function maskMoney(i) { let v = i.value.replace(/\D/g, ''); v = (v/100).toFixed(2).replace('.', ','); v = v.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); i.value = v; }
+        function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function createNewItem() { return { productId: '', productName: '', productCode: '', date: new Date().toISOString().split('T')[0], arrived: '', loss: '', unit: 'kg', price: 0, photos: { produto: [], balanca: [], etiqueta: [] } }; }
 
-        function createNewItem() {
-            return {
-                productId: '', productName: '', productCode: '',
-                date: new Date().toISOString().split('T')[0],
-                arrived: '', loss: '', unit: 'kg', price: 0,
-                photos: { produto: [], balanca: [], etiqueta: [] }
-            };
-        }
-
-        // --- INICIALIZACAO ---
         window.onload = async () => {
-            await DB.init();
-            state.products = await DB.load('products');
-            state.history = await DB.loadHistory();
-            state.vendas = await DB.load('vendas');
-            state.fluigs = await DB.load('fluigs');
-            state.settings = await DB.load('settings');
-            state.tratativa.items = [createNewItem()];
-            renderHome();
-            initSplash();
+            try {
+                await DB.init();
+                state.products = await DB.load('products');
+                state.history = await DB.loadHistory();
+                state.vendas = await DB.load('vendas');
+                state.fluigs = await DB.load('fluigs');
+                state.settings = await DB.load('settings');
+                state.tratativa.items = [createNewItem()];
+                renderHome();
+            } catch (e) { alert("Erro ao carregar app."); }
         };
-
-        function initSplash() {
-            const canvas = document.getElementById('splashCanvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            ctx.fillStyle = 'rgba(255,255,255,0.1)';
-            for(let i=0; i<50; i++) {
-                ctx.beginPath();
-                ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*5, 0, Math.PI*2);
-                ctx.fill();
-            }
-        }
 
         function hideSplash() { document.getElementById('splash').style.display = 'none'; }
 
@@ -525,14 +201,9 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-' + tabId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            const navItems = document.querySelectorAll('.nav-item');
-            if (tabId === 'home') navItems[0].classList.add('active');
-            if (tabId === 'products') navItems[1].classList.add('active');
-            if (tabId === 'new-tratativa') navItems[2].classList.add('active');
-            if (tabId === 'dashboard') navItems[3].classList.add('active');
-            if (tabId === 'history') navItems[4].classList.add('active');
-            
-            if (tabId === 'dashboard') loadDashboard();
+            const idx = {home:0,products:1,'new-tratativa':2,dashboard:3,history:4}[tabId];
+            document.querySelectorAll('.nav-item')[idx].classList.add('active');
+            if (tabId === 'dashboard') renderDashboard();
             if (tabId === 'home') renderHome();
             if (tabId === 'products') renderProducts();
             if (tabId === 'new-tratativa') renderNewTratativa();
@@ -540,80 +211,31 @@
             if (tabId === 'dispatch') renderDispatch();
         }
 
-        // --- LOGICA PRODUTOS ---
         function renderProducts() {
             const list = document.getElementById('product-list');
             const query = document.getElementById('product-search').value.toLowerCase();
-            const filtered = state.products.filter(p => !p.deleted && (p.name.toLowerCase().includes(query) || p.code.includes(query))).sort((a,b) => a.name.localeCompare(b.name));
-            document.getElementById('product-total-counter').innerText = state.products.filter(p => !p.deleted).length;
-            if (filtered.length === 0) { list.innerHTML = '<p class="text-center" style="padding: 20px; color: #999;">Nenhum produto.</p>'; }
-            else {
-                list.innerHTML = filtered.map(p => `
-                    <div class="product-item">
-                        <div class="product-info"><h4>${p.name}</h4><p class="mono">Cód: ${p.code}</p></div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-outline" onclick="showProductModal('${p.id}')">📝</button>
-                            <button class="btn btn-outline" style="color:var(--danger);border-color:var(--danger)" onclick="deleteProduct('${p.id}')">🗑️</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
+            const filtered = state.products.filter(p => !p.deleted && (p.name.toLowerCase().includes(query) || p.code.includes(query))).sort((a,b)=>a.name.localeCompare(b.name));
+            document.getElementById('product-total-counter').innerText = state.products.filter(p=>!p.deleted).length;
+            list.innerHTML = filtered.map(p => `<div class="product-item"><div class="product-info"><h4>${p.name}</h4><p class="mono">Cód: ${p.code}</p></div><div style="display:flex;gap:10px;"><button class="btn btn-outline" onclick="showProductModal('${p.id}')">📝</button><button class="btn btn-outline" style="color:var(--danger);border-color:var(--danger)" onclick="deleteProduct('${p.id}')">🗑️</button></div></div>`).join('') || '<p class="text-center" style="padding:20px;color:#999;">Vazio.</p>';
         }
 
         function filterProductsList() { renderProducts(); }
-
-        function triggerOCR(mode) {
-            if (mode === 'camera') document.getElementById('ocr-input-camera').click();
-            else document.getElementById('ocr-input-gallery').click();
-        }
-
+        function triggerOCR(mode) { document.getElementById('ocr-input-'+mode).click(); }
         async function handleOCR(input) {
-            if (!input.files || !input.files[0]) return;
-            showToast('Lendo Nota Fiscal...');
-            const file = input.files[0];
+            if (!input.files[0]) return;
+            showToast('Lendo...');
             try {
-                const processedBlob = await preprocessImageForOCR(file);
                 const worker = await Tesseract.createWorker('por');
-                const ret = await worker.recognize(processedBlob);
-                const text = ret.data.text; await worker.terminate();
-                showOCRReviewModal(text);
-            } catch (e) { showToast('Erro na leitura'); }
+                const ret = await worker.recognize(input.files[0]);
+                await worker.terminate();
+                showOCRReviewModal(ret.data.text);
+            } catch (e) { showToast('Erro OCR'); }
             input.value = '';
-        }
-
-        function preprocessImageForOCR(file) {
-            return new Promise(res => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        canvas.width = img.width; canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
-                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                        const data = imageData.data;
-                        for (let i = 0; i < data.length; i += 4) {
-                            const avg = (data[i] + data[i+1] + data[i+2]) / 3;
-                            data[i] = data[i+1] = data[i+2] = avg > 128 ? 255 : 0;
-                        }
-                        ctx.putImageData(imageData, 0, 0);
-                        canvas.toBlob(res, 'image/png');
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
         }
 
         function showOCRReviewModal(text) {
             const modal = document.getElementById('modal'); const content = document.getElementById('modal-content');
-            content.innerHTML = `
-                <div class="modal-header"><h3>Revisar Leitura</h3><button class="btn" onclick="closeModal()">✕</button></div>
-                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Ajuste o texto se necessário. O app busca por "Código Nome".</p>
-                <textarea id="ocr-raw-text" style="height: 200px; font-size: 0.8rem; margin-bottom: 15px;">${text}</textarea>
-                <button class="btn btn-primary btn-block" onclick="processOCRText()">Cadastrar Produtos</button>
-            `;
+            content.innerHTML = `<div class="modal-header"><h3>Revisar</h3><button class="btn" onclick="closeModal()">✕</button></div><textarea id="ocr-raw-text" style="height:200px;">${text}</textarea><button class="btn btn-primary btn-block" onclick="processOCRText()">Cadastrar</button>`;
             modal.style.display = 'flex';
         }
 
@@ -621,29 +243,19 @@
             const text = document.getElementById('ocr-raw-text').value;
             const lines = text.split('\n'); let found = 0;
             lines.forEach(line => {
-                let cleanLine = line.replace(/\|/g, 'I').replace(/l /g, ' ').toUpperCase();
-                const match = cleanLine.match(/(\d{3,12})[\s\-\.]*([A-Z\s]{3,})/);
-                if (match) {
-                    const code = match[1];
-                    let name = match[2].trim();
-                    name = name.replace(/\s(KG|UN)$/, '').trim();
-                    if (name.length > 2 && !state.products.find(p => p.code === code)) {
-                        state.products.push({ id: Date.now()+'_'+found, name, code, unit: 'kg', price: 0, deleted: false });
-                        found++;
-                    }
+                const match = line.toUpperCase().match(/(\d{3,12})[\s\-\.]*([A-Z\s]{3,})/);
+                if (match && !state.products.find(p => p.code === match[1])) {
+                    state.products.push({ id: Date.now()+'_'+found, name: match[2].trim().replace(/\s(KG|UN)$/, ''), code: match[1], deleted: false });
+                    found++;
                 }
             });
             DB.save('products', state.products); closeModal(); renderProducts();
-            showToast(found > 0 ? `${found} produtos novos!` : 'Nenhum identificado.');
+            showToast(found + ' novos!');
         }
 
-        // --- LOGICA TRATATIVA ---
         function renderNewTratativa() {
             const item = state.tratativa.items[state.tratativa.activeIdx];
-            const tabs = document.getElementById('tratativa-tabs');
-            tabs.innerHTML = state.tratativa.items.map((_, i) => `
-                <div class="tab" style="padding: 8px 15px; background: ${i===state.tratativa.activeIdx?'var(--primary-green)':'#ddd'}; color: ${i===state.tratativa.activeIdx?'white':'#666'}; border-radius: 20px; white-space: nowrap; font-weight: 700; font-size: 0.8rem;" onclick="selectTratativaItem(${i})">Item ${i+1}</div>
-            `).join('') + `<div class="tab" style="padding: 8px 15px; background: #eee; border-radius: 20px;" onclick="addNewTratativaItem()">➕</div>`;
+            document.getElementById('tratativa-tabs').innerHTML = state.tratativa.items.map((_, i) => `<div class="tab" style="padding:8px 15px;background:${i===state.tratativa.activeIdx?'var(--primary-green)':'#ddd'};color:${i===state.tratativa.activeIdx?'white':'#666'};border-radius:20px;" onclick="selectTratativaItem(${i})">Item ${i+1}</div>`).join('') + `<div onclick="addNewTratativaItem()" style="padding:8px 15px;background:#eee;border-radius:20px;">➕</div>`;
             document.getElementById('t-product-input').value = item.productName ? `${item.productName} (${item.productCode})` : '';
             document.getElementById('t-date').value = item.date;
             document.getElementById('t-arrived').value = item.arrived;
@@ -653,247 +265,151 @@
             updateInternalLossPerc(); renderPhotos();
         }
 
-        function updateItemUnit(val) {
-            state.tratativa.items[state.tratativa.activeIdx].unit = val;
-            document.querySelectorAll('.t-unit-label').forEach(el => el.innerText = val);
-        }
-
+        function updateItemUnit(val) { state.tratativa.items[state.tratativa.activeIdx].unit = val; document.querySelectorAll('.t-unit-label').forEach(el => el.innerText = val); }
         function selectTratativaItem(idx) { state.tratativa.activeIdx = idx; renderNewTratativa(); }
         function addNewTratativaItem() { state.tratativa.items.push(createNewItem()); state.tratativa.activeIdx = state.tratativa.items.length-1; renderNewTratativa(); }
-
+        
         let currentMediaTarget = '';
-        function captureMedia(type, mode) {
-            currentMediaTarget = type;
-            if (mode === 'camera') document.getElementById('media-input-camera').click();
-            else document.getElementById('media-input-gallery').click();
-        }
-
+        function captureMedia(type, mode) { currentMediaTarget = type; document.getElementById('media-input-'+mode).click(); }
         async function processMedia(input) {
-            if (!input.files.length) return;
-            showToast('Processando...');
             const item = state.tratativa.items[state.tratativa.activeIdx];
             for (let file of input.files) {
-                const compressed = await compressImage(file);
-                if (currentMediaTarget === 'etiqueta') item.photos[currentMediaTarget] = [compressed];
-                else item.photos[currentMediaTarget].push(compressed);
-            }
-            renderPhotos(); input.value = '';
-        }
-
-        function renderPhotos() {
-            const item = state.tratativa.items[state.tratativa.activeIdx];
-            ['produto', 'balanca', 'etiqueta'].forEach(t => {
-                const el = document.getElementById('p-'+t+'-grid');
-                el.innerHTML = item.photos[t].map((src, idx) => `
-                    <div class="photo-box">
-                        <img src="${src}">
-                        <button class="remove-btn" onclick="removePhoto('${t}', ${idx})">✕</button>
-                    </div>
-                `).join('');
-            });
-        }
-
-        function removePhoto(type, idx) {
-            state.tratativa.items[state.tratativa.activeIdx].photos[type].splice(idx, 1);
-            renderPhotos();
-        }
-
-        function compressImage(file) {
-            return new Promise(res => {
                 const reader = new FileReader();
                 reader.onload = e => {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height, max = 1000;
-                        if (w > h) { if (w > max) { h *= max/w; w = max; } } else { if (h > max) { w *= max/h; h = max; } }
+                        let w = img.width, h = img.height; if(w>1000){ h*=1000/w; w=1000; }
                         canvas.width = w; canvas.height = h;
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        res(canvas.toDataURL('image/jpeg', 0.7));
+                        const base64 = canvas.toDataURL('image/jpeg', 0.7);
+                        if (currentMediaTarget === 'etiqueta') item.photos.etiqueta = [base64];
+                        else item.photos[currentMediaTarget].push(base64);
+                        renderPhotos();
                     };
                     img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
-            });
+            }
+            input.value = '';
         }
 
+        function renderPhotos() {
+            const item = state.tratativa.items[state.tratativa.activeIdx];
+            ['produto', 'balanca', 'etiqueta'].forEach(t => {
+                document.getElementById('p-'+t+'-grid').innerHTML = item.photos[t].map((src, idx) => `<div class="photo-box"><img src="${src}"><button class="remove-btn" onclick="removePhoto('${t}', ${idx})">✕</button></div>`).join('');
+            });
+        }
+        function removePhoto(t, i) { state.tratativa.items[state.tratativa.activeIdx].photos[t].splice(i, 1); renderPhotos(); }
+
         async function saveAndGoToDispatch() {
-            const validItems = state.tratativa.items.filter(i => i.productCode && i.loss > 0);
-            if (!validItems.length) return showToast('Adicione produtos e quebra!');
-            const id = 't_'+Date.now();
-            const text = generateWhatsAppText(validItems);
-            const record = { id, timestamp: Date.now(), date: validItems[0].date, items: JSON.parse(JSON.stringify(validItems)), text };
+            const valid = state.tratativa.items.filter(i => i.productCode && i.loss > 0);
+            if (!valid.length) return showToast('Dados incompletos!');
+            const record = { id: 't_'+Date.now(), timestamp: Date.now(), date: valid[0].date, items: JSON.parse(JSON.stringify(valid)), text: generateWhatsAppText(valid) };
             await DB.saveTratativa(record);
-            state.history.unshift(record);
-            state.currentDispatch = record;
+            state.history.unshift(record); state.currentDispatch = record;
             state.tratativa = { items: [createNewItem()], activeIdx: 0 };
             switchTab('dispatch');
         }
 
-        function generateWhatsAppText(items) {
-            return items.map(i => {
-                return `Cód: ${i.productCode}\n${i.productName}\nData: ${formatDate(i.date)}\nChegou: ${i.arrived} ${i.unit}\nQtd da quebra: ${i.loss} ${i.unit}`;
-            }).join('\n\n');
-        }
+        function generateWhatsAppText(items) { return items.map(i => `Cód: ${i.productCode}\n${i.productName}\nData: ${formatDate(i.date)}\nChegou: ${i.arrived} ${i.unit}\nQtd da quebra: ${i.loss} ${i.unit}`).join('\n\n'); }
+        function resetTratativa() { if(confirm('Limpar?')){ state.tratativa={items:[createNewItem()],activeIdx:0}; renderNewTratativa(); } }
 
-        function resetTratativa() {
-            if (confirm('Limpar toda a tratativa atual?')) {
-                state.tratativa = { items: [createNewItem()], activeIdx: 0 };
-                renderNewTratativa();
-            }
-        }
-
-        // --- DISPATCH ---
         function renderDispatch() {
-            const d = state.currentDispatch; if (!d) return;
+            const d = state.currentDispatch; if(!d) return;
             document.getElementById('dispatch-text').value = d.text;
-            const mediaList = document.getElementById('dispatch-media-list');
-            mediaList.innerHTML = '';
-            d.items.forEach((item, i) => {
-                ['produto', 'balanca', 'etiqueta'].forEach(type => {
+            const list = document.getElementById('dispatch-media-list'); list.innerHTML = '';
+            d.items.forEach(item => {
+                ['produto','balanca','etiqueta'].forEach(type => {
                     item.photos[type].forEach((src, idx) => {
-                        const div = document.createElement('div');
-                        div.className = 'card';
-                        div.innerHTML = `
-                            <p style="font-size:0.7rem; font-weight:700; margin-bottom:5px; color:var(--primary-green)">${item.productName} - ${type.toUpperCase()} (${idx+1})</p>
-                            <img src="${src}" style="width:100%; border-radius:8px; margin-bottom:10px;">
-                            <button class="btn btn-outline btn-block" onclick="shareMedia('${src}', '${item.productName}_${type}')">📤 Compartilhar Foto</button>
-                        `;
-                        mediaList.appendChild(div);
+                        const div = document.createElement('div'); div.className = 'card';
+                        div.innerHTML = `<p style="font-size:0.7rem;font-weight:700;color:var(--primary-green)">${item.productName} - ${type.toUpperCase()}</p><img src="${src}" style="width:100%;border-radius:8px;margin-bottom:10px;"><button class="btn btn-outline btn-block" onclick="shareMedia('${src}')">📤 Enviar Foto</button>`;
+                        list.appendChild(div);
                     });
                 });
             });
         }
-
-        function sendToWhatsAppText() {
-            const text = encodeURIComponent(state.currentDispatch.text);
-            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        function sendToWhatsAppText() { window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(state.currentDispatch.text)}`, '_blank'); }
+        async function shareMedia(base64) {
+            const blob = await (await fetch(base64)).blob();
+            const file = new File([blob], 'foto.jpg', { type: 'image/jpeg' });
+            if (navigator.share) navigator.share({ files: [file] });
+            else showToast('Use o navegador do celular.');
         }
 
-        async function shareMedia(base64, filename) {
-            try {
-                const blob = await (await fetch(base64)).blob();
-                const file = new File([blob], filename + '.jpg', { type: 'image/jpeg' });
-                if (navigator.share && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: 'Foto Tratativa' });
-                } else {
-                    const link = document.createElement('a');
-                    link.href = base64; link.download = filename + '.jpg'; link.click();
-                    showToast('Compartilhamento não suportado. Foto baixada.');
-                }
-            } catch (e) { showToast('Erro ao compartilhar'); }
+        function calculateMonthStats(m) {
+            const ts = state.history.filter(h => h.date.startsWith(m)), vs = state.vendas[m] || {}, fs = state.fluigs[m] || [];
+            let v = 0; for(let d in vs) v += vs[d];
+            let qb = 0; ts.forEach(t => t.items.forEach(i => qb += (i.loss||0)*(i.price||0)));
+            let p = fs.reduce((a,f)=>a+f.valor, 0);
+            let ptc = qb + p;
+            let perc = v > 0 ? (ptc/v)*100 : 0;
+            let now = new Date(), last = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate(), cur = m===now.toISOString().substring(0,7)?now.getDate():last;
+            return { vendas: v, quebraBruta: qb, perda: p, perdaTotal: ptc, percPerdaTotal: perc, projecao: (qb/cur)*last };
         }
 
-        // --- DASHBOARD ---
-        function getAvailableMonths() {
-            const ms = new Set();
-            state.history.forEach(h => ms.add(h.date.substring(0, 7)));
-            for (let m in state.vendas) ms.add(m);
-            for (let m in state.fluigs) ms.add(m);
-            const now = new Date().toISOString().substring(0, 7); ms.add(now);
-            return Array.from(ms).sort().reverse();
+        function renderDashboard() {
+            const m = new Date().toISOString().substring(0, 7);
+            const ms = Array.from(new Set([...state.history.map(h=>h.date.substring(0,7)), m])).sort().reverse();
+            document.getElementById('dash-month-selector').innerHTML = ms.map(x => `<option value="${x}">${formatMonth(x)}</option>`).join('');
+            loadDashboard();
         }
 
-        function renderDashboard() { const sel = document.getElementById('dash-month-selector'); const ms = getAvailableMonths(); sel.innerHTML = ms.map(m => `<option value="${m}">${formatMonth(m)}</option>`).join(''); loadDashboard(); }
-        
         function loadDashboard() {
             const m = document.getElementById('dash-month-selector').value; const s = calculateMonthStats(m);
-            const isAlerta = Math.abs(s.percPerdaTotal) > state.settings.meta;
+            const isAlerta = s.percPerdaTotal > state.settings.meta;
             document.getElementById('dash-status-text').innerText = isAlerta ? '🔴 ALERTA' : '✅ BOM';
             document.getElementById('dash-status-text').style.color = isAlerta ? 'var(--danger)' : 'var(--success)';
             document.getElementById('dash-vendas').innerText = formatCurrency(s.vendas);
             document.getElementById('dash-quebra-bruta').innerText = formatCurrency(s.quebraBruta);
             document.getElementById('dash-perda').innerText = formatCurrency(s.perda);
             document.getElementById('dash-perda-total').innerText = formatCurrency(s.perdaTotal);
-            document.getElementById('dash-proj-text').innerText = `${formatCurrency(s.quebraBruta)} / ${formatCurrency(s.projecao)}`;
-            document.getElementById('dash-perc-val').innerText = Math.abs(s.percPerdaTotal).toFixed(2).replace('.', ',') + '%';
-            document.getElementById('dash-meta-val').innerText = state.settings.meta.toString().replace('.', ',');
-            document.getElementById('dash-meta-progress').style.width = Math.min(100, (Math.abs(s.percPerdaTotal) / state.settings.meta) * 100) + '%';
+            document.getElementById('dash-perc-val').innerText = s.percPerdaTotal.toFixed(2).replace('.', ',') + '%';
+            document.getElementById('dash-meta-progress').style.width = Math.min(100, (s.percPerdaTotal/state.settings.meta)*100) + '%';
             renderEvolutionTable(m);
         }
 
         function renderEvolutionTable(m) {
-            const body = document.getElementById('dash-evolution-body');
             const days = {};
             state.history.filter(h => h.date.startsWith(m)).forEach(h => {
-                if (!days[h.date]) days[h.date] = { venda: 0, quebra: 0 };
-                h.items.forEach(i => {
-                    days[h.date].quebra += (parseFloat(i.loss)||0) * (parseFloat(i.price)||0);
-                });
+                if(!days[h.date]) days[h.date] = {v:0, q:0};
+                h.items.forEach(i => days[h.date].q += (i.loss||0)*(i.price||0));
             });
-            const monthVendas = state.vendas[m] || {};
-            for (let d in monthVendas) {
-                if (!days[d]) days[d] = { venda: 0, quebra: 0 };
-                days[d].venda = monthVendas[d];
-            }
-            const sortedDays = Object.keys(days).sort().reverse();
-            body.innerHTML = sortedDays.map(d => {
-                const day = days[d];
-                const perc = day.venda > 0 ? (day.quebra / day.venda) * 100 : 0;
-                const isGood = perc <= state.settings.meta;
-                return `
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 10px 0;">${d.split('-')[2]}/${d.split('-')[1]}</td>
-                        <td>${formatCurrency(day.venda).replace('R$ ','')}</td>
-                        <td>${formatCurrency(day.quebra).replace('R$ ','')}</td>
-                        <td style="font-weight:700; color:${isGood?'var(--success)':'var(--danger)'}">${perc.toFixed(1)}%</td>
-                        <td style="text-align:center">${isGood?'📉':'📈'}</td>
-                        <td style="text-align:center"><button class="btn btn-outline" style="padding:2px 5px; color:var(--danger); border-color:var(--danger)" onclick="deleteDayData('${d}')">🗑️</button></td>
-                    </tr>
-                `;
-            }).join('') || '<tr><td colspan="6" style="text-align:center; padding:10px;">Sem dados este mês.</td></tr>';
+            const vs = state.vendas[m] || {}; for(let d in vs){ if(!days[d]) days[d]={v:0,q:0}; days[d].v = vs[d]; }
+            document.getElementById('dash-evolution-body').innerHTML = Object.keys(days).sort().reverse().map(d => {
+                const day = days[d]; const perc = day.v > 0 ? (day.q/day.v)*100 : 0; const ok = perc <= state.settings.meta;
+                return `<tr style="border-bottom:1px solid #eee;"><td style="padding:10px;">${d.split('-')[2]}/${d.split('-')[1]}</td><td>${formatCurrency(day.v).replace('R$ ','')}</td><td>${formatCurrency(day.q).replace('R$ ','')}</td><td>${perc.toFixed(1)}%</td><td style="text-align:center">${ok?'📉':'📈'}</td><td style="text-align:center"><button onclick="deleteDayData('${d}')">🗑️</button></td></tr>`;
+            }).join('') || '<tr><td colspan="6" style="text-align:center;padding:10px;">Sem dados.</td></tr>';
         }
 
-        async function deleteDayData(date) {
-            if (!confirm(`Deseja apagar todos os dados do dia ${formatDate(date)}?`)) return;
-            const m = date.substring(0, 7);
-            if (state.vendas[m] && state.vendas[m][date]) { delete state.vendas[m][date]; await DB.save('vendas', state.vendas); }
-            const toDelete = state.history.filter(h => h.date === date);
-            for (let h of toDelete) { await DB.deleteHistory(h.id); }
-            state.history = await DB.loadHistory();
-            loadDashboard();
+        async function deleteDayData(d) {
+            if(!confirm('Apagar dia?')) return;
+            const m = d.substring(0,7); if(state.vendas[m]) delete state.vendas[m][d];
+            const ids = state.history.filter(h=>h.date===d).map(h=>h.id);
+            for(let id of ids) await DB.deleteHistory(id);
+            state.history = await DB.loadHistory(); DB.save('vendas', state.vendas); loadDashboard();
         }
 
-        function calculateMonthStats(m) {
-            const ts = state.history.filter(h => h.date.startsWith(m)), vs = state.vendas[m] || {}, fs = state.fluigs[m] || [];
-            let totalV = 0; for (let d in vs) totalV += vs[d];
-            let totalQB = 0; ts.forEach(t => t.items.forEach(i => {
-                totalQB += (parseFloat(i.loss) || 0) * (parseFloat(i.price) || 0);
-            }));
-            const totalP = fs.reduce((a,f) => a+f.valor, 0);
-            const totalPTC = totalQB + totalP;
-            const perc = totalV > 0 ? (totalPTC/totalV)*100 : 0;
-            const now = new Date(), lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate(), cur = m === now.toISOString().substring(0,7) ? now.getDate() : lastDay;
-            return { vendas: totalV, quebraBruta: totalQB, perda: totalP, perdaTotal: totalPTC, percPerdaTotal: perc, projecao: (totalQB/cur)*lastDay };
-        }
-
-        // --- OUTRAS FUNCOES ---
         function renderHome() {
             const today = new Date().toISOString().split('T')[0];
-            const todayTratativas = state.history.filter(h => h.date === today);
-            document.getElementById('home-today-count').innerText = todayTratativas.length;
-            const monthData = calculateMonthStats(today.substring(0, 7));
-            document.getElementById('home-total-bruta').innerText = formatCurrency(monthData.quebraBruta);
-            document.getElementById('home-perc-quebra').innerText = Math.abs(monthData.percPerdaTotal).toFixed(1).replace('.', ',') + '%';
-            const badge = document.getElementById('home-status-badge');
-            const isAlert = Math.abs(monthData.percPerdaTotal) > state.settings.meta;
-            badge.innerText = isAlert ? 'ALERTA' : 'BOM';
-            badge.className = 'badge ' + (isAlert ? 'badge-danger' : 'badge-success');
-            document.getElementById('home-meta-progress').style.width = Math.min(100, (Math.abs(monthData.percPerdaTotal) / state.settings.meta) * 100) + '%';
-            const list = document.getElementById('home-recent-list');
-            const recent = state.history.slice(0, 5);
-            list.innerHTML = recent.length ? recent.map(h => `<div class="card" style="padding: 10px; font-size: 0.9rem;"><div style="display: flex; justify-content: space-between;"><strong>${h.items[0].productName}</strong><span class="mono">${formatDate(h.date)}</span></div></div>`).join('') : '<p class="text-center" style="color: #999; padding: 20px;">Nenhuma tratativa recente.</p>';
+            const ts = state.history.filter(h => h.date === today);
+            document.getElementById('home-today-count').innerText = ts.length;
+            const s = calculateMonthStats(today.substring(0,7));
+            document.getElementById('home-total-bruta').innerText = formatCurrency(s.quebraBruta);
+            document.getElementById('home-perc-quebra').innerText = s.percPerdaTotal.toFixed(1).replace('.', ',') + '%';
+            const isAlert = s.percPerdaTotal > state.settings.meta;
+            document.getElementById('home-status-badge').innerText = isAlert ? 'ALERTA' : 'BOM';
+            document.getElementById('home-status-badge').className = 'badge ' + (isAlert ? 'badge-danger' : 'badge-success');
+            document.getElementById('home-meta-progress').style.width = Math.min(100, (s.percPerdaTotal/state.settings.meta)*100) + '%';
+            document.getElementById('home-recent-list').innerHTML = state.history.slice(0,5).map(h => `<div class="card" style="padding:10px;font-size:0.9rem;"><strong>${h.items[0].productName}</strong> - ${formatDate(h.date)}</div>`).join('') || '<p style="text-align:center;color:#999;padding:20px;">Sem dados.</p>';
         }
 
         function handleProductAutocomplete(input) {
-            const val = input.value.trim().toLowerCase(); const results = document.getElementById('t-autocomplete-results');
-            if (val.length < 1) { results.classList.add('hidden'); return; }
-            const filtered = state.products.filter(p => !p.deleted && (p.name.toLowerCase().includes(val) || p.code.includes(val))).slice(0, 10);
-            if (filtered.length === 0) { results.classList.add('hidden'); }
-            else {
-                results.innerHTML = filtered.map(p => `<div class="autocomplete-item" onclick="selectProductForTratativa('${p.id}')"><strong>${p.name}</strong><br><small>${p.code}</small></div>`).join('');
-                results.classList.remove('hidden');
-            }
+            const val = input.value.trim().toLowerCase();
+            if(val.length < 1) { document.getElementById('t-autocomplete-results').classList.add('hidden'); return; }
+            const filtered = state.products.filter(p => !p.deleted && (p.name.toLowerCase().includes(val) || p.code.includes(val))).slice(0,10);
+            document.getElementById('t-autocomplete-results').innerHTML = filtered.map(p => `<div class="autocomplete-item" onclick="selectProductForTratativa('${p.id}')"><strong>${p.name}</strong><br><small>${p.code}</small></div>`).join('');
+            document.getElementById('t-autocomplete-results').classList.toggle('hidden', filtered.length === 0);
         }
         function selectProductForTratativa(id) {
             const p = state.products.find(x => x.id === id); const item = state.tratativa.items[state.tratativa.activeIdx];
@@ -906,88 +422,53 @@
             item.arrived = parseFloat(document.getElementById('t-arrived').value) || 0;
             item.loss = parseFloat(document.getElementById('t-loss').value) || 0;
             item.price = parseMoney(document.getElementById('t-price-today').value);
-            const perc = item.arrived > 0 ? (item.loss / item.arrived) * 100 : 0;
+            const perc = item.arrived > 0 ? (item.loss/item.arrived)*100 : 0;
             document.getElementById('t-internal-perc').innerText = perc.toFixed(1) + '%';
             document.getElementById('t-internal-progress').style.width = Math.min(perc, 100) + '%';
             document.getElementById('t-internal-progress').style.background = perc > state.settings.meta ? 'var(--danger)' : 'var(--success)';
         }
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = state.history.map(h => `<div class="card" onclick="viewHistoryDetail('${h.id}')"><div style="display:flex;justify-content:space-between"><strong>${h.items[0].productName}...</strong><span class="mono">${formatDate(h.date)}</span></div><p style="font-size:0.8rem;color:#666">${h.items.length} itens | ${formatCurrency(h.items.reduce((a,i)=>(a+(i.loss*i.price)),0))}</p></div>`).join('');
-        }
-        function viewHistoryDetail(id) { state.currentDispatch = state.history.find(h => h.id === id); switchTab('dispatch'); renderDispatch(); }
+        function renderHistory() { document.getElementById('history-list').innerHTML = state.history.map(h => `<div class="card" onclick="viewHistoryDetail('${h.id}')"><strong>${h.items[0].productName}...</strong><br><small>${formatDate(h.date)} | ${h.items.length} itens</small></div>`).join(''); }
+        function viewHistoryDetail(id) { state.currentDispatch = state.history.find(h => h.id === id); switchTab('dispatch'); }
         function showProductModal(id = null) {
             const p = id ? state.products.find(x => x.id === id) : { name: '', code: '' };
-            const modal = document.getElementById('modal'); const content = document.getElementById('modal-content');
-            content.innerHTML = `<div class="modal-header"><h3>${id ? 'Editar' : 'Novo'} Produto</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="form-group"><label>Código</label><input type="text" id="m-p-code" value="${p.code}"></div><div class="form-group"><label>Nome</label><input type="text" id="m-p-name" value="${p.name}"></div><button class="btn btn-primary btn-block" onclick="saveProduct('${id||''}')">Salvar Produto</button>`;
-            modal.style.display = 'flex';
+            document.getElementById('modal-content').innerHTML = `<div class="modal-header"><h3>Produto</h3><button onclick="closeModal()">✕</button></div><div class="form-group"><label>Código</label><input type="text" id="m-p-code" value="${p.code}"></div><div class="form-group"><label>Nome</label><input type="text" id="m-p-name" value="${p.name}"></div><button class="btn btn-primary btn-block" onclick="saveProduct('${id||''}')">Salvar</button>`;
+            document.getElementById('modal').style.display = 'flex';
         }
         async function saveProduct(id) {
             const name = document.getElementById('m-p-name').value, code = document.getElementById('m-p-code').value;
-            if (!name || !code) return showToast('Preencha tudo!');
-            if (!id && state.products.find(p => p.code === code && !p.deleted)) return showToast('Código já cadastrado!');
-            if (id) { const idx = state.products.findIndex(p => p.id === id); state.products[idx] = { ...state.products[idx], name, code }; }
-            else { state.products.push({ id: Date.now()+'', name, code, unit: 'kg', price: 0, deleted: false }); }
+            if(!name || !code) return;
+            if(!id && state.products.find(p=>p.code===code&&!p.deleted)) return showToast('Código duplicado!');
+            if(id){ const idx = state.products.findIndex(p=>p.id===id); state.products[idx] = {...state.products[idx], name, code}; }
+            else state.products.push({ id: Date.now()+'', name, code, deleted: false });
             DB.save('products', state.products); closeModal(); renderProducts();
         }
-        function deleteProduct(id) { if (confirm('Excluir?')) { const idx = state.products.findIndex(p => p.id === id); state.products[idx].deleted = true; DB.save('products', state.products); renderProducts(); } }
+        function deleteProduct(id) { if(confirm('Excluir?')){ const idx = state.products.findIndex(p=>p.id===id); state.products[idx].deleted = true; DB.save('products', state.products); renderProducts(); } }
         
         function showVendaModal() {
-            const m = document.getElementById('dash-month-selector').value; const modal = document.getElementById('modal'); const content = document.getElementById('modal-content');
-            const totalVendaMes = calculateMonthStats(m).vendas;
-            content.innerHTML = `<div class="modal-header"><h3>Venda Mensal</h3><button class="btn" onclick="closeModal()">✕</button></div>
-                <div class="form-group"><label>Venda Total Acumulada (Mês)</label><input type="text" id="m-v-val" value="${formatCurrency(totalVendaMes).replace('R$ ','')}" oninput="maskMoney(this)"></div>
-                <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:15px;">Dica: Você pode editar o valor total ou lançar por dia abaixo.</p>
-                <div class="form-group"><label>Lançar por Dia (Opcional)</label><input type="date" id="m-v-date" value="${new Date().toISOString().split('T')[0]}"></div>
-                <button class="btn btn-primary btn-block" onclick="saveVenda()">Salvar Venda</button>`;
-            modal.style.display = 'flex';
+            const m = document.getElementById('dash-month-selector').value;
+            document.getElementById('modal-content').innerHTML = `<div class="modal-header"><h3>Venda</h3><button onclick="closeModal()">✕</button></div><div class="form-group"><label>Venda Total</label><input type="text" id="m-v-val" oninput="maskMoney(this)"></div><div class="form-group"><label>Data</label><input type="date" id="m-v-date" value="${new Date().toISOString().split('T')[0]}"></div><button class="btn btn-primary btn-block" onclick="saveVenda()">Salvar</button>`;
+            document.getElementById('modal').style.display = 'flex';
         }
         function saveVenda() {
             const v = parseMoney(document.getElementById('m-v-val').value), d = document.getElementById('m-v-date').value, m = document.getElementById('dash-month-selector').value;
-            if (!state.vendas[m]) state.vendas[m] = {};
-            state.vendas[m][d] = v;
+            if(!state.vendas[m]) state.vendas[m] = {}; state.vendas[m][d] = v;
             DB.save('vendas', state.vendas); closeModal(); loadDashboard();
         }
 
         function showFluigModal() {
-            const m = document.getElementById('dash-month-selector').value; const modal = document.getElementById('modal'); const content = document.getElementById('modal-content');
-            const fluigs = state.fluigs[m] || [];
-            content.innerHTML = `<div class="modal-header"><h3>R$ Perda (Ajustes)</h3><button class="btn" onclick="closeModal()">✕</button></div>
-                <div id="fluig-list" style="margin-bottom:15px; max-height:200px; overflow-y:auto;">
-                    ${fluigs.map((f, i) => `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; font-size:0.8rem;"><span>${f.desc} (${f.qtd})</span><span>${formatCurrency(f.valor)} <button onclick="deleteFluig(${i})" style="color:var(--danger); border:none; background:none; cursor:pointer; margin-left:10px;">🗑️</button></span></div>`).join('') || '<p style="font-size:0.8rem; color:#999;">Nenhum ajuste.</p>'}
-                </div>
-                <div class="form-group"><label>Produto</label><input type="text" id="m-f-desc" placeholder="Ex: Banana"></div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div class="form-group"><label>Quantidade</label><input type="number" id="m-f-qtd" value="1" oninput="updateFluigTotal()"></div>
-                    <div class="form-group"><label>Valor Unitário</label><input type="text" id="m-f-unit" placeholder="0,00" oninput="maskMoney(this); updateFluigTotal()"></div>
-                </div>
-                <div class="form-group"><label>Valor Total do Ajuste</label><input type="text" id="m-f-total" value="R$ 0,00" readonly style="background:#f0f0f0; font-weight:700;"></div>
-                <button class="btn btn-primary btn-block" onclick="saveFluig()">Salvar Ajuste</button>`;
-            modal.style.display = 'flex';
-        }
-
-        function updateFluigTotal() {
-            const qtd = parseFloat(document.getElementById('m-f-qtd').value) || 0;
-            const unit = parseMoney(document.getElementById('m-f-unit').value);
-            document.getElementById('m-f-total').value = formatCurrency(qtd * unit);
-        }
-
-        function saveFluig() {
             const m = document.getElementById('dash-month-selector').value;
-            const desc = document.getElementById('m-f-desc').value;
-            const qtd = parseFloat(document.getElementById('m-f-qtd').value) || 0;
-            const valor = parseMoney(document.getElementById('m-f-unit').value) * qtd;
-            if (!desc || valor <= 0) return showToast('Preencha os dados!');
-            if (!state.fluigs[m]) state.fluigs[m] = [];
-            state.fluigs[m].push({ desc, valor, qtd });
+            const fs = state.fluigs[m] || [];
+            document.getElementById('modal-content').innerHTML = `<div class="modal-header"><h3>Ajustes</h3><button onclick="closeModal()">✕</button></div><div id="fluig-list">${fs.map((f,i)=>`<div>${f.desc} - ${formatCurrency(f.valor)} <button onclick="deleteFluig(${i})">🗑️</button></div>`).join('')}</div><div class="form-group"><label>Produto</label><input type="text" id="m-f-desc"></div><div class="form-group"><label>Qtd</label><input type="number" id="m-f-qtd" oninput="updateFluigTotal()"></div><div class="form-group"><label>Unitário</label><input type="text" id="m-f-unit" oninput="maskMoney(this);updateFluigTotal()"></div><div class="form-group"><label>Total</label><input type="text" id="m-f-total" readonly></div><button class="btn btn-primary btn-block" onclick="saveFluig()">Salvar</button>`;
+            document.getElementById('modal').style.display = 'flex';
+        }
+        function updateFluigTotal() { const q = parseFloat(document.getElementById('m-f-qtd').value)||0; const u = parseMoney(document.getElementById('m-f-unit').value); document.getElementById('m-f-total').value = formatCurrency(q*u); }
+        function saveFluig() {
+            const m = document.getElementById('dash-month-selector').value, desc = document.getElementById('m-f-desc').value, q = parseFloat(document.getElementById('m-f-qtd').value)||0, v = parseMoney(document.getElementById('m-f-unit').value)*q;
+            if(!desc || v <= 0) return;
+            if(!state.fluigs[m]) state.fluigs[m] = []; state.fluigs[m].push({desc, valor:v, qtd:q});
             DB.save('fluigs', state.fluigs); closeModal(); loadDashboard();
         }
-
-        function deleteFluig(idx) {
-            const m = document.getElementById('dash-month-selector').value;
-            state.fluigs[m].splice(idx, 1);
-            DB.save('fluigs', state.fluigs); showFluigModal(); loadDashboard();
-        }
+        function deleteFluig(i) { const m = document.getElementById('dash-month-selector').value; state.fluigs[m].splice(i,1); DB.save('fluigs', state.fluigs); showFluigModal(); loadDashboard(); }
     </script>
 </body>
 </html>
