@@ -3,31 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FLV Controle - Dia a Dia</title>
+    <title>FLV Controle</title>
+    
+    <!-- Meta tags para PWA e Mobile -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FLV Controle">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1c4a1c">
+
+    <!-- Ícone e Manifesto (Links diretos e redundantes para garantir reconhecimento) -->
+    <link rel="icon" type="image/png" href="https://img.icons8.com/color/512/leaf.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/512/leaf.png">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22FLV%20Controle%22,%22short_name%22:%22FLV%20Controle%22,%22start_url%22:%22index.html%22,%22display%22:%22standalone%22,%22background_color%22:%22#1c4a1c%22,%22theme_color%22:%22#1c4a1c%22,%22icons%22:[{%22src%22:%22https://img.icons8.com/color/512/leaf.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
     <style>
         :root { --header-bg: #1c4a1c; --primary-green: #2d6a2d; --bg-color: #eef2eb; --card-bg: #ffffff; --text-main: #333333; --text-muted: #666666; --danger: #d32f2f; --success: #2e7d32; --shadow: 0 4px 12px rgba(0,0,0,0.08); --border-radius: 14px; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { font-family: 'Nunito', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; overflow-x: hidden; padding-bottom: 80px; }
         .mono { font-family: 'Source Code Pro', monospace; }
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1c4a1c 0%, #2d6a2d 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
-        #splash h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .btn-enter { background: white; color: var(--header-bg); border: none; padding: 12px 40px; border-radius: 30px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        
+        /* Splash Screen - Versão Blindada */
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1c4a1c 0%, #2d6a2d 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; transition: opacity 0.5s ease; }
+        .btn-enter { background: white; color: var(--header-bg); border: none; padding: 15px 45px; border-radius: 30px; font-weight: 700; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); margin-top: 20px; }
+        
         header { background-color: var(--header-bg); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         nav.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 0.7rem; flex: 1; border: none; background: none; font-family: inherit; cursor: pointer; }
         .nav-item.active { color: var(--primary-green); font-weight: 700; }
         .nav-item i { font-size: 1.4rem; margin-bottom: 4px; font-style: normal; }
         .nav-center { position: relative; top: -20px; background: var(--primary-green); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(45, 106, 45, 0.4); border: 5px solid var(--bg-color); font-size: 24px; }
+        
         .screen { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow); }
         .btn { border: none; border-radius: 8px; padding: 10px 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-primary { background: var(--primary-green); color: white; }
@@ -61,16 +76,20 @@
     </style>
 </head>
 <body>
+    <!-- Splash Screen que não trava -->
     <div id="splash">
-        <h1>FLV Controle</h1>
-        <p>QUEBRA DE HORTIFRUTI</p>
-        <button class="btn-enter" onclick="hideSplash()">Entrar no App</button>
-        <div style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">Powered by William Jesus</div>
+        <div style="background: white; border-radius: 25px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <img src="https://img.icons8.com/color/96/leaf.png" alt="logo">
+        </div>
+        <h1 style="font-size: 2rem; margin-bottom: 5px;">FLV Controle</h1>
+        <p style="letter-spacing: 2px; font-weight: 600; opacity: 0.9;">HORTIFRUTI DIA A DIA</p>
+        <button class="btn-enter" onclick="hideSplash()">ABRIR APP</button>
+        <div style="margin-top: 30px; font-size: 0.7rem; opacity: 0.7;">Versão 7.0 - Final Bug Fix</div>
     </div>
 
     <header>
         <div style="font-weight: 700; font-size: 1.2rem;">FLV Controle</div>
-        <div id="header-store" style="font-size: 0.8rem; opacity: 0.8;">Dia a Dia</div>
+        <div style="font-size: 0.8rem; opacity: 0.8;">Dia a Dia</div>
     </header>
 
     <main id="app">
@@ -104,10 +123,6 @@
                 <input type="file" id="ocr-camera" accept="image/*" capture="environment" class="hidden" onchange="handleOCR(this)">
                 <input type="file" id="ocr-gallery" accept="image/*" class="hidden" onchange="handleOCR(this)">
             </div>
-            <div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between;">
-                <span>Lista de Produtos</span>
-                <span>Total: <b id="product-total-counter">0</b></span>
-            </div>
             <div id="product-list"></div>
         </section>
 
@@ -137,76 +152,69 @@
                 
                 <label>FOTOS DO PRODUTO (GALERIA)</label>
                 <div class="photo-grid" id="photos-product">
-                    <div class="photo-box" onclick="triggerPhoto('p')">➕<br>Fotos</div>
+                    <div class="photo-box" onclick="document.getElementById('input-p-prod').click()">➕<br>Galeria</div>
                 </div>
-                <input type="file" id="input-p" accept="image/*" multiple class="hidden" onchange="handlePhotos(this, 'product')">
+                <input type="file" id="input-p-prod" accept="image/*" multiple class="hidden" onchange="handlePhotos(this, 'product')">
 
-                <label style="margin-top:15px;display:block;">FOTOS DA BALANÇA (GALERIA)</label>
+                <label style="margin-top:15px;">FOTOS DA BALANÇA (GALERIA)</label>
                 <div class="photo-grid" id="photos-scale">
-                    <div class="photo-box" onclick="triggerPhoto('s')">➕<br>Fotos</div>
+                    <div class="photo-box" onclick="document.getElementById('input-p-scale').click()">➕<br>Galeria</div>
                 </div>
-                <input type="file" id="input-s" accept="image/*" multiple class="hidden" onchange="handlePhotos(this, 'scale')">
+                <input type="file" id="input-p-scale" accept="image/*" multiple class="hidden" onchange="handlePhotos(this, 'scale')">
 
-                <label style="margin-top:15px;display:block;">FOTO DA ETIQUETA (CÂMERA)</label>
+                <label style="margin-top:15px;">FOTO DA ETIQUETA (CÂMERA)</label>
                 <div class="photo-grid" id="photos-label">
-                    <div class="photo-box" id="box-label" onclick="triggerPhoto('l')">➕<br>Câmera</div>
+                    <div class="photo-box" id="label-photo-box" onclick="document.getElementById('input-p-label').click()">📷<br>Câmera</div>
                 </div>
-                <input type="file" id="input-l" accept="image/*" capture="environment" class="hidden" onchange="handlePhotos(this, 'label')">
+                <input type="file" id="input-p-label" accept="image/*" capture="environment" class="hidden" onchange="handlePhotos(this, 'label')">
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
                     <button class="btn btn-outline" onclick="resetTratativa()">Limpar</button>
                     <button class="btn btn-primary" onclick="saveTratativa()">Salvar Tratativa</button>
                 </div>
             </div>
         </section>
 
-        <!-- DESPACHO -->
-        <section id="screen-dispatch" class="screen">
-            <div class="card text-center">
-                <h2 style="color:var(--success)">✅ Tratativa Salva!</h2>
-                <p style="margin-bottom:20px;">Envie os dados para o WhatsApp</p>
-                <button class="btn btn-primary btn-block" onclick="sendWhatsApp()">📱 Enviar Texto para WhatsApp</button>
-            </div>
-            <div id="dispatch-photos-container" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"></div>
-            <button class="btn btn-outline btn-block" style="margin-top:20px;" onclick="switchTab('home')">Voltar ao Início</button>
-        </section>
-
         <!-- DASHBOARD -->
-        <section id="screen-dashboard" class="screen">
-            <div class="card">
-                <select id="dash-month" onchange="renderDashboard()" style="margin-bottom: 15px; font-weight: 700;"></select>
-                <div class="summary-grid">
-                    <div class="card summary-card" onclick="showVendaModal()" style="cursor:pointer;background:#f9fdf9;">
-                        <span class="label">VENDA TOTAL</span><span class="value mono" id="dash-vendas">R$ 0,00</span>
-                    </div>
-                    <div class="card summary-card">
-                        <span class="label">R$ QUEBRA</span><span class="value mono" id="dash-quebra">R$ 0,00</span>
-                    </div>
-                    <div class="card summary-card" onclick="showAjusteModal()" style="cursor:pointer;background:#fff9f9;">
-                        <span class="label">R$ PERDA (AJUSTES)</span><span class="value mono" id="dash-perda">R$ 0,00</span>
-                    </div>
-                    <div class="card summary-card">
-                        <span class="label">CONCILIADA</span><span class="value mono" id="dash-conciliada">R$ 0,00</span>
-                    </div>
+        <section id="screen-dash" class="screen">
+            <div class="card summary-card" style="margin-bottom:20px;">
+                <label>MÊS DE REFERÊNCIA</label>
+                <select id="dash-month" onchange="renderDashboard()" style="margin-bottom:15px; font-weight:700; color:var(--header-bg); border-color:var(--header-bg);"></select>
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--header-bg);" id="dash-perc">0,00%</div>
+                <div id="dash-status" style="font-weight: 700; margin-bottom:10px;">SITUAÇÃO: BOM</div>
+                <div class="meta-bar"><div id="dash-progress" class="meta-progress"></div></div>
+            </div>
+
+            <div class="summary-grid">
+                <button class="card summary-card btn-outline" onclick="showVendaModal()">
+                    <span class="label">VENDA TOTAL</span>
+                    <span class="value mono" id="dash-venda">R$ 0,00</span>
+                </button>
+                <div class="card summary-card">
+                    <span class="label">R$ QUEBRA BRUTA</span>
+                    <span class="value mono" id="dash-quebra">R$ 0,00</span>
                 </div>
-                <div class="text-center">
-                    <div id="dash-perc" style="font-size: 2rem; font-weight: 800; color: var(--primary-green);">0,00%</div>
-                    <div id="dash-status" style="font-weight: 700; margin-bottom: 10px;">SITUAÇÃO: BOM</div>
-                    <div class="meta-bar"><div id="dash-progress" class="meta-progress"></div></div>
+                <button class="card summary-card btn-outline" onclick="showAjusteModal()">
+                    <span class="label">R$ PERDA (AJUSTES)</span>
+                    <span class="value mono" id="dash-perda">R$ 0,00</span>
+                </button>
+                <div class="card summary-card">
+                    <span class="label">TOTAL CONCILIADO</span>
+                    <span class="value mono" id="dash-conciliada">R$ 0,00</span>
                 </div>
             </div>
 
-            <h3 style="margin-bottom:10px;">Evolução Diária</h3>
-            <div class="card" style="padding:0; overflow-x:auto;">
-                <table style="width:100%; border-collapse: collapse; font-size: 0.8rem;">
-                    <thead>
-                        <tr style="background:#f0f0f0; text-align:left;">
-                            <th style="padding:8px;">Data</th>
-                            <th>Venda</th>
-                            <th>Quebra</th>
-                            <th>%</th>
-                            <th>Imp.</th>
-                            <th></th>
+            <h3 style="margin: 15px 0 10px 0;">Evolução Diária</h3>
+            <div class="card" style="padding:0; overflow:hidden;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+                    <thead style="background:#f8f8f8;">
+                        <tr>
+                            <th style="padding:10px; text-align:left;">DATA</th>
+                            <th style="text-align:left;">VENDA</th>
+                            <th style="text-align:left;">QUEBRA</th>
+                            <th style="text-align:left;">%</th>
+                            <th style="text-align:center;">IMP.</th>
+                            <th style="text-align:center;">🗑️</th>
                         </tr>
                     </thead>
                     <tbody id="dash-evolution"></tbody>
@@ -216,30 +224,45 @@
 
         <!-- HISTORICO -->
         <section id="screen-history" class="screen">
+            <h3 style="margin-bottom:15px;">Histórico</h3>
             <div id="history-list"></div>
+        </section>
+
+        <!-- DESPACHO -->
+        <section id="screen-dispatch" class="screen">
+            <button class="btn btn-outline" style="margin-bottom:15px;" onclick="switchTab('history')">⬅ Voltar</button>
+            <div class="card">
+                <h3 id="d-title">Produto</h3>
+                <p id="d-date" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px;"></p>
+                <div class="card mono" style="background:#f9f9f9; font-size:0.9rem; white-space:pre-wrap;" id="d-text"></div>
+                <button class="btn btn-primary btn-block" onclick="sendWhatsApp()">📱 Enviar Texto p/ WhatsApp</button>
+                <h4 style="margin:20px 0 10px 0;">Fotos</h4>
+                <div id="d-photos-list"></div>
+            </div>
         </section>
     </main>
 
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="switchTab('home')"><i>🏠</i>Início</button>
         <button class="nav-item" onclick="switchTab('products')"><i>🏷️</i>Produtos</button>
-        <button class="nav-item nav-center" onclick="switchTab('new-tratativa')">➕</button>
-        <button class="nav-item" onclick="switchTab('dashboard')"><i>📈</i>Dash</button>
+        <button class="nav-item" onclick="switchTab('new-tratativa')"><div class="nav-center">➕</div></button>
+        <button class="nav-item" onclick="switchTab('dash')"><i>📈</i>Dash</button>
         <button class="nav-item" onclick="switchTab('history')"><i>📋</i>Histórico</button>
     </nav>
 
-    <div id="modal" class="modal"><div id="modal-content" class="modal-content"></div></div>
+    <div id="modal" class="modal"><div class="modal-content" id="modal-content"></div></div>
     <div id="toast"></div>
 
     <script>
-        // ESTADO E PERSISTENCIA
+        // ESTADO
         let state = {
             products: JSON.parse(localStorage.getItem('flv_products') || '[]'),
             history: JSON.parse(localStorage.getItem('flv_history') || '[]'),
             vendas: JSON.parse(localStorage.getItem('flv_vendas') || '{}'),
             ajustes: JSON.parse(localStorage.getItem('flv_ajustes') || '{}'),
             meta: 3.5,
-            currentPhotos: { product: [], scale: [], label: [] },
+            currentPhotos: { product: [], scale: [], label: null },
+            selectedProduct: null,
             dispatch: null
         };
 
@@ -250,31 +273,43 @@
             localStorage.setItem('flv_ajustes', JSON.stringify(state.ajustes));
         }
 
-        // UTILITARIOS
-        function hideSplash() { document.getElementById('splash').style.display = 'none'; }
-        function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
-        function formatCurrency(v) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v); }
+        // SERVICE WORKER EMBUTIDO (Para PWA funcionar offline e instalar ícone)
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'flv-v7';
+                self.addEventListener('install', e => e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['index.html']))));
+                self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl).catch(e => console.log('SW Fail'));
+        }
+
+        // UI
+        function hideSplash() { 
+            const s = document.getElementById('splash');
+            s.style.opacity = '0';
+            setTimeout(() => s.style.display = 'none', 500);
+        }
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
+        function formatCurrency(v) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0); }
         function formatDate(d) { return d.split('-').reverse().join('/'); }
         function maskMoney(i) {
-            let v = i.value.replace(/\D/g,'');
-            v = (v/100).toFixed(2).replace('.', ',');
+            let v = i.value.replace(/\D/g, '');
+            v = (v / 100).toFixed(2).replace('.', ',');
             v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
             i.value = v;
         }
-        function parseMoney(v) { return parseFloat(v.replace(/\./g,'').replace(',','.')) || 0; }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function parseMoney(v) { if(!v) return 0; return parseFloat(v.replace(/\./g, '').replace(',', '.')) || 0; }
 
-        // NAVEGACAO
         function switchTab(tab) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-' + tab).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            const idx = ['home','products','new-tratativa','dashboard','history'].indexOf(tab);
-            if(idx !== -1) document.querySelectorAll('.nav-item')[idx].classList.add('active');
-            
-            if(tab === 'home') renderHome();
-            if(tab === 'products') renderProducts();
-            if(tab === 'dashboard') renderDashboard();
+            document.getElementById('screen-' + tab).classList.add('active');
+            const navItems = document.querySelectorAll('.nav-item');
+            if(tab === 'home') navItems[0].classList.add('active');
+            if(tab === 'products') navItems[1].classList.add('active');
+            if(tab === 'dash') { initDashMonths(); renderDashboard(); }
             if(tab === 'history') renderHistory();
             if(tab === 'dispatch') renderDispatch();
             window.scrollTo(0,0);
@@ -282,211 +317,166 @@
 
         // PRODUTOS
         function renderProducts() {
-            const q = document.getElementById('product-search').value.toLowerCase();
-            const list = state.products.filter(p => p.name.toLowerCase().includes(q) || p.code.includes(q)).sort((a,b) => a.name.localeCompare(b.name));
-            document.getElementById('product-total-counter').innerText = state.products.length;
-            document.getElementById('product-list').innerHTML = list.map(p => `
-                <div class="card product-item">
-                    <div><strong>${p.name}</strong><br><small class="mono">Cód: ${p.code}</small></div>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn btn-outline" onclick="editProduct('${p.code}')">📝</button>
-                        <button class="btn btn-outline" onclick="deleteProduct('${p.code}')" style="color:var(--danger)">🗑️</button>
+            const query = document.getElementById('product-search').value.toLowerCase();
+            const filtered = state.products.filter(p => p.name.toLowerCase().includes(query) || p.code.includes(query));
+            document.getElementById('product-list').innerHTML = filtered.sort((a,b) => a.name.localeCompare(b.name)).map(p => `
+                <div class="product-item">
+                    <div><strong>${p.name}</strong><br><small>Cód: ${p.code}</small></div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn btn-outline" onclick="showProductModal('${p.id}')">📝</button>
+                        <button class="btn btn-outline" style="color:var(--danger)" onclick="deleteProduct('${p.id}')">🗑️</button>
                     </div>
                 </div>
             `).join('') || '<p class="text-center" style="padding:20px;color:#999;">Nenhum produto.</p>';
         }
 
-        function showProductModal(code = '') {
-            const p = state.products.find(x => x.code === code) || { name: '', code: '' };
+        function showProductModal(id = null) {
+            const p = id ? state.products.find(x => x.id === id) : { name: '', code: '' };
             const content = `
-                <div class="modal-header"><h3>${code?'Editar':'Novo'} Produto</h3><button class="btn" onclick="closeModal()">✕</button></div>
-                <div class="form-group"><label>Código</label><input type="text" id="m-p-code" value="${p.code}" ${code?'readonly':''}></div>
-                <div class="form-group"><label>Nome do Produto</label><input type="text" id="m-p-name" value="${p.name}"></div>
-                <button class="btn btn-primary btn-block" onclick="saveProduct('${code}')">Salvar Produto</button>
+                <div class="modal-header"><h3>${id ? 'Editar' : 'Novo'} Produto</h3><button class="btn" onclick="closeModal()">✕</button></div>
+                <div class="form-group"><label>CÓDIGO</label><input type="text" id="m-p-code" value="${p.code}"></div>
+                <div class="form-group"><label>NOME DO PRODUTO</label><input type="text" id="m-p-name" value="${p.name}"></div>
+                <button class="btn btn-primary btn-block" onclick="saveProduct('${id}')">Salvar Produto</button>
             `;
             document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal').style.display = 'flex';
         }
 
-        function saveProduct(oldCode) {
+        function saveProduct(id) {
             const code = document.getElementById('m-p-code').value.trim();
             const name = document.getElementById('m-p-name').value.trim();
             if(!code || !name) return showToast('Preencha tudo!');
-            if(!oldCode && state.products.some(x => x.code === code)) return showToast('Código já existe!');
-            
-            if(oldCode) {
-                const idx = state.products.findIndex(x => x.code === oldCode);
-                state.products[idx] = { code, name };
+            if(id !== 'null' && id) {
+                const idx = state.products.findIndex(x => x.id === id);
+                state.products[idx] = { ...state.products[idx], code, name };
             } else {
-                state.products.push({ code, name });
+                state.products.push({ id: Date.now().toString(), code, name });
             }
-            save(); closeModal(); renderProducts(); showToast('Produto salvo!');
+            save(); closeModal(); renderProducts(); showToast('Salvo!');
         }
 
-        function deleteProduct(code) { if(confirm('Excluir produto?')) { state.products = state.products.filter(x => x.code !== code); save(); renderProducts(); } }
+        function deleteProduct(id) { if(confirm('Excluir?')) { state.products = state.products.filter(x => x.id !== id); save(); renderProducts(); } }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
         // OCR
         async function handleOCR(input) {
-            if(!input.files[0]) return;
-            showToast('Lendo nota fiscal... aguarde');
-            const { data: { text } } = await Tesseract.recognize(input.files[0], 'por');
-            const lines = text.split('\n');
-            let found = 0;
-            lines.forEach(line => {
-                const match = line.match(/(\d{3,12})\s+([A-Z\s]{3,})/);
-                if(match) {
-                    const code = match[1];
-                    const name = match[2].trim().replace(/\s+KG$|\s+UN$/, '');
-                    if(!state.products.some(x => x.code === code)) {
-                        state.products.push({ code, name });
-                        found++;
+            if(!input.files || !input.files[0]) return;
+            showToast('Lendo nota...');
+            try {
+                const result = await Tesseract.recognize(input.files[0], 'por');
+                const lines = result.data.text.split('\n');
+                let count = 0;
+                lines.forEach(line => {
+                    const match = line.match(/(\d{3,12})\s+([A-Z\s]{3,})/);
+                    if(match) {
+                        const code = match[1];
+                        let name = match[2].trim().replace(/\s+KG$|\s+UN$/i, '');
+                        if(!state.products.find(p => p.code === code)) {
+                            state.products.push({ id: Date.now().toString() + count, code, name });
+                            count++;
+                        }
                     }
-                }
-            });
-            save(); renderProducts();
-            showToast(found > 0 ? `${found} novos produtos cadastrados!` : 'Nenhum produto novo identificado.');
+                });
+                save(); renderProducts();
+                showToast(count > 0 ? `${count} produtos importados!` : 'Nenhum novo.');
+            } catch (e) { showToast('Erro no OCR.'); }
             input.value = '';
         }
 
         // TRATATIVA
-        function triggerPhoto(id) { document.getElementById('input-' + id).click(); }
+        function handleAutocomplete(input) {
+            const val = input.value.toLowerCase();
+            const results = document.getElementById('t-autocomplete-results');
+            if(val.length < 1) { results.classList.add('hidden'); return; }
+            const filtered = state.products.filter(p => p.name.toLowerCase().includes(val) || p.code.includes(val)).slice(0,5);
+            if(filtered.length === 0) { results.classList.add('hidden'); return; }
+            results.innerHTML = filtered.map(p => `<div class="autocomplete-item" onclick="selectProduct('${p.id}')"><b>${p.code}</b> - ${p.name}</div>`).join('');
+            results.classList.remove('hidden');
+        }
+
+        function selectProduct(id) {
+            state.selectedProduct = state.products.find(x => x.id === id);
+            document.getElementById('t-product-input').value = state.selectedProduct.name;
+            document.getElementById('t-autocomplete-results').classList.add('hidden');
+        }
+
+        function updateUnitLabels(u) { document.querySelectorAll('.unit-label').forEach(el => el.innerText = u); }
+
         function handlePhotos(input, type) {
+            if(!input.files) return;
             Array.from(input.files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const src = e.target.result;
-                    if(type === 'label') state.currentPhotos.label = [src];
-                    else state.currentPhotos[type].push(src);
-                    renderPhotoGrid(type);
+                    if(type === 'label') { state.currentPhotos.label = e.target.result; renderPhotoGrid('label'); }
+                    else { state.currentPhotos[type].push(e.target.result); renderPhotoGrid(type); }
                 };
                 reader.readAsDataURL(file);
             });
         }
+
         function renderPhotoGrid(type) {
-            const container = document.getElementById('photos-' + (type==='product'?'product':type==='scale'?'scale':'label'));
-            const photos = state.currentPhotos[type];
-            let html = photos.map((src, i) => `
-                <div class="photo-box">
-                    <img src="${src}">
-                    <button class="remove-btn" onclick="removePhoto('${type}', ${i})">✕</button>
-                </div>
-            `).join('');
-            if(type !== 'label' || photos.length === 0) {
-                html += `<div class="photo-box" onclick="triggerPhoto('${type==='product'?'p':type==='scale'?'s':'l'}')">➕<br>${type==='label'?'Câmera':'Fotos'}</div>`;
+            const gridId = type === 'product' ? 'photos-product' : type === 'scale' ? 'photos-scale' : 'photos-label';
+            const grid = document.getElementById(gridId);
+            let html = '';
+            if(type === 'label') {
+                html = state.currentPhotos.label ? `<div class="photo-box"><img src="${state.currentPhotos.label}"><button class="remove-btn" onclick="removePhoto('label', 0)">✕</button></div>` : `<div class="photo-box" onclick="document.getElementById('input-p-label').click()">📷<br>Câmera</div>`;
+            } else {
+                html = state.currentPhotos[type].map((src, i) => `<div class="photo-box"><img src="${src}"><button class="remove-btn" onclick="removePhoto('${type}', ${i})">✕</button></div>`).join('');
+                html += `<div class="photo-box" onclick="document.getElementById('input-p-${type === 'product' ? 'prod' : 'scale'}').click()">➕<br>Galeria</div>`;
             }
-            container.innerHTML = html;
-        }
-        function removePhoto(type, i) { state.currentPhotos[type].splice(i, 1); renderPhotoGrid(type); }
-
-        function handleAutocomplete(input) {
-            const q = input.value.toLowerCase();
-            const res = document.getElementById('t-autocomplete-results');
-            if(q.length < 1) { res.classList.add('hidden'); return; }
-            const matches = state.products.filter(p => p.name.toLowerCase().includes(q) || p.code.includes(q)).slice(0, 5);
-            if(matches.length > 0) {
-                res.innerHTML = matches.map(p => `<div class="autocomplete-item" onclick="selectProduct('${p.code}', '${p.name}')"><b>${p.code}</b> - ${p.name}</div>`).join('');
-                res.classList.remove('hidden');
-            } else { res.classList.add('hidden'); }
-        }
-        function selectProduct(code, name) {
-            document.getElementById('t-product-input').value = name;
-            document.getElementById('t-product-input').dataset.code = code;
-            document.getElementById('t-autocomplete-results').classList.add('hidden');
+            grid.innerHTML = html;
         }
 
-        function saveTratativa() {
-            const name = document.getElementById('t-product-input').value;
-            const code = document.getElementById('t-product-input').dataset.code;
-            const date = document.getElementById('t-date').value;
-            const loss = document.getElementById('t-loss').value;
-            const arrived = document.getElementById('t-arrived').value;
-            const price = parseMoney(document.getElementById('t-price').value);
-
-            if(!code || !date || !loss || !arrived || price <= 0) return showToast('Preencha todos os campos obrigatórios!');
-
-            const id = Date.now().toString();
-            const tratativa = {
-                id, date, productCode: code, productName: name,
-                loss, arrived, price, unit: document.getElementById('t-unit').value,
-                photos: { ...state.currentPhotos }
-            };
-
-            state.history.unshift(tratativa);
-            save();
-            
-            state.dispatch = {
-                productName: name,
-                text: `*Cód:* ${code}\n${name}\n*Data:* ${formatDate(date)}\n*Chegou:* ${arrived}${tratativa.unit}\n*Qtd da quebra:* ${loss}${tratativa.unit}`,
-                photos: tratativa.photos
-            };
-            
-            resetTratativa();
-            switchTab('dispatch');
+        function removePhoto(type, i) {
+            if(type === 'label') state.currentPhotos.label = null;
+            else state.currentPhotos[type].splice(i, 1);
+            renderPhotoGrid(type);
         }
 
         function resetTratativa() {
             document.getElementById('t-product-input').value = '';
-            document.getElementById('t-product-input').dataset.code = '';
-            document.getElementById('t-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('t-loss').value = '';
             document.getElementById('t-arrived').value = '';
+            document.getElementById('t-loss').value = '';
             document.getElementById('t-price').value = '';
-            state.currentPhotos = { product: [], scale: [], label: [] };
+            state.selectedProduct = null;
+            state.currentPhotos = { product: [], scale: [], label: null };
             renderPhotoGrid('product'); renderPhotoGrid('scale'); renderPhotoGrid('label');
         }
 
-        function renderDispatch() {
-            const d = state.dispatch;
-            const container = document.getElementById('dispatch-photos-container');
-            container.innerHTML = '';
-            ['product', 'scale', 'label'].forEach(type => {
-                d.photos[type].forEach((src, i) => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <p style="font-size:0.7rem;font-weight:700;margin-bottom:8px;color:var(--primary-green)">${type.toUpperCase()}</p>
-                        <img src="${src}" style="width:100%;border-radius:8px;margin-bottom:10px;">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
-                            <button class="btn btn-outline btn-block" onclick="downloadPhoto('${src}', '${d.productName}_${type}_${i}')">💾</button>
-                            <button class="btn btn-primary btn-block" onclick="sharePhoto('${src}', '${d.productName}_${type}_${i}')">📤</button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            });
-        }
+        function saveTratativa() {
+            const loss = parseFloat(document.getElementById('t-loss').value);
+            const arrived = parseFloat(document.getElementById('t-arrived').value);
+            const price = parseMoney(document.getElementById('t-price').value);
+            const date = document.getElementById('t-date').value;
+            if(!state.selectedProduct || !loss || !date || price <= 0) return showToast('Preencha os campos!');
 
-        async function sharePhoto(src, name) {
-            try {
-                const response = await fetch(src);
-                const blob = await response.blob();
-                const file = new File([blob], name + '.jpg', { type: 'image/jpeg' });
-                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: 'Foto FLV', text: 'Foto: ' + state.dispatch.productName });
-                } else {
-                    downloadPhoto(src, name);
-                    showToast('Compartilhamento não suportado. Baixado.');
-                }
-            } catch (err) { downloadPhoto(src, name); }
-        }
+            const item = {
+                id: Date.now().toString(),
+                productId: state.selectedProduct.id,
+                productName: state.selectedProduct.name,
+                productCode: state.selectedProduct.code,
+                date, unit: document.getElementById('t-unit').value,
+                arrived, loss, price,
+                photos: JSON.parse(JSON.stringify(state.currentPhotos))
+            };
 
-        function downloadPhoto(src, name) {
-            const link = document.createElement('a');
-            link.href = src; link.download = name + '.jpg';
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            state.history.unshift(item);
+            save(); resetTratativa();
+            state.dispatch = item;
+            switchTab('dispatch');
         }
-
-        function sendWhatsApp() { window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(state.dispatch.text)}`, '_blank'); }
 
         // DASHBOARD
-        function renderDashboard() {
+        function initDashMonths() {
+            const s = document.getElementById('dash-month');
+            const months = [...new Set(state.history.map(x => x.date.substring(0,7)))];
             const now = new Date().toISOString().substring(0,7);
-            const months = Array.from(new Set([...Object.keys(state.vendas), ...Object.keys(state.ajustes), ...state.history.map(h => h.date.substring(0,7)), now])).sort().reverse();
-            const selector = document.getElementById('dash-month');
-            const currentSel = selector.value || now;
-            selector.innerHTML = months.map(m => `<option value="${m}" ${m===currentSel?'selected':''}>${m.split('-')[1]}/${m.split('-')[0]}</option>`).join('');
-            
-            const m = selector.value;
+            if(!months.includes(now)) months.push(now);
+            s.innerHTML = months.sort().reverse().map(m => `<option value="${m}">${m.split('-').reverse().join('/')}</option>`).join('');
+        }
+
+        function renderDashboard() {
+            const m = document.getElementById('dash-month').value;
             const h = state.history.filter(x => x.date.startsWith(m));
             const vTotal = Object.values(state.vendas[m] || {}).reduce((a,b) => a+b, 0);
             const qBruta = h.reduce((a,b) => a + (parseFloat(b.loss)||0) * (b.price||0), 0);
@@ -495,7 +485,7 @@
             const perc = vTotal > 0 ? (conciliada / vTotal) * 100 : 0;
             const isAlerta = perc > state.meta;
 
-            document.getElementById('dash-vendas').innerText = formatCurrency(vTotal);
+            document.getElementById('dash-venda').innerText = formatCurrency(vTotal);
             document.getElementById('dash-quebra').innerText = formatCurrency(qBruta);
             document.getElementById('dash-perda').innerText = formatCurrency(aTotal);
             document.getElementById('dash-conciliada').innerText = formatCurrency(conciliada);
@@ -510,35 +500,25 @@
 
         function renderEvolution(m) {
             const days = {};
-            const h = state.history.filter(x => x.date.startsWith(m));
-            h.forEach(x => { if(!days[x.date]) days[x.date] = {v:0, q:0}; days[x.date].q += (parseFloat(x.loss)||0) * (x.price||0); });
+            state.history.filter(x => x.date.startsWith(m)).forEach(x => { if(!days[x.date]) days[x.date] = {v:0, q:0}; days[x.date].q += (parseFloat(x.loss)||0) * (x.price||0); });
             const vs = state.vendas[m] || {};
             for(let d in vs) { if(!days[d]) days[d] = {v:0, q:0}; days[d].v = vs[d]; }
 
-            const body = document.getElementById('dash-evolution');
-            body.innerHTML = Object.keys(days).sort().reverse().map(d => {
+            document.getElementById('dash-evolution').innerHTML = Object.keys(days).sort().reverse().map(d => {
                 const day = days[d];
                 const p = day.v > 0 ? (day.q/day.v)*100 : 0;
-                const imp = p <= state.meta ? '📉' : '📈';
-                return `<tr><td style="padding:8px;">${d.split('-')[2]}/${d.split('-')[1]}</td><td>${formatCurrency(day.v).replace('R$','')}</td><td>${formatCurrency(day.q).replace('R$','')}</td><td>${p.toFixed(1)}%</td><td style="text-align:center">${imp}</td><td><button onclick="deleteDay('${d}')" style="border:none;background:none;">🗑️</button></td></tr>`;
-            }).join('') || '<tr><td colspan="6" class="text-center" style="padding:20px;">Sem dados</td></tr>';
+                return `<tr><td style="padding:10px;">${d.split('-')[2]}/${d.split('-')[1]}</td><td>${formatCurrency(day.v).replace('R$','')}</td><td>${formatCurrency(day.q).replace('R$','')}</td><td>${p.toFixed(1)}%</td><td style="text-align:center">${p > state.meta ? '📈' : '📉'}</td><td><button onclick="deleteDay('${d}')" style="border:none;background:none;">🗑️</button></td></tr>`;
+            }).join('') || '<tr><td colspan="6" class="text-center" style="padding:20px;">Vazio</td></tr>';
         }
 
-        function deleteDay(d) {
-            if(confirm('Apagar dados deste dia?')) {
-                const m = d.substring(0,7);
-                if(state.vendas[m]) delete state.vendas[m][d];
-                state.history = state.history.filter(x => x.date !== d);
-                save(); renderDashboard();
-            }
-        }
-
+        function deleteDay(d) { if(confirm('Apagar dia?')) { const m = d.substring(0,7); if(state.vendas[m]) delete state.vendas[m][d]; state.history = state.history.filter(x => x.date !== d); save(); renderDashboard(); } }
+        
         function showVendaModal() {
             const content = `
-                <div class="modal-header"><h3>Lançar Venda</h3><button class="btn" onclick="closeModal()">✕</button></div>
+                <div class="modal-header"><h3>Venda</h3><button class="btn" onclick="closeModal()">✕</button></div>
                 <div class="form-group"><label>Data</label><input type="date" id="m-v-date" value="${new Date().toISOString().split('T')[0]}"></div>
-                <div class="form-group"><label>Valor da Venda</label><input type="text" id="m-v-val" oninput="maskMoney(this)" placeholder="0,00"></div>
-                <button class="btn btn-primary btn-block" onclick="saveVenda()">Salvar Venda</button>
+                <div class="form-group"><label>Valor</label><input type="text" id="m-v-val" oninput="maskMoney(this)" placeholder="0,00"></div>
+                <button class="btn btn-primary btn-block" onclick="saveVenda()">Salvar</button>
             `;
             document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal').style.display = 'flex';
@@ -546,7 +526,7 @@
         function saveVenda() {
             const d = document.getElementById('m-v-date').value;
             const v = parseMoney(document.getElementById('m-v-val').value);
-            if(!d || v <= 0) return showToast('Preencha tudo!');
+            if(!d || v <= 0) return;
             const m = d.substring(0,7);
             if(!state.vendas[m]) state.vendas[m] = {};
             state.vendas[m][d] = v;
@@ -557,28 +537,26 @@
             const m = document.getElementById('dash-month').value;
             const fs = state.ajustes[m] || [];
             const content = `
-                <div class="modal-header"><h3>Ajustes (Fluig)</h3><button class="btn" onclick="closeModal()">✕</button></div>
-                <div style="max-height:150px;overflow-y:auto;margin-bottom:15px;border:1px solid #eee;border-radius:8px;padding:5px;">
-                    ${fs.map((f,i) => `<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #eee;font-size:0.8rem;"><span>${f.desc} (${f.qtd})</span><span>${formatCurrency(f.valor)} <button onclick="deleteAjuste(${i})" style="border:none;background:none;">🗑️</button></span></div>`).join('') || '<p class="text-center" style="padding:10px;color:#999;">Nenhum ajuste.</p>'}
+                <div class="modal-header"><h3>Ajustes</h3><button class="btn" onclick="closeModal()">✕</button></div>
+                <div style="max-height:150px;overflow-y:auto;margin-bottom:15px;border:1px solid #eee;border-radius:8px;">
+                    ${fs.map((f,i) => `<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #eee;font-size:0.8rem;"><span>${f.desc}</span><span>${formatCurrency(f.valor)} <button onclick="deleteAjuste(${i})" style="border:none;background:none;">🗑️</button></span></div>`).join('') || '<p class="text-center" style="padding:10px;">Vazio</p>'}
                 </div>
-                <div class="form-group"><label>Produto/Descrição</label><input type="text" id="m-f-desc"></div>
+                <div class="form-group"><label>Descrição</label><input type="text" id="m-f-desc"></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                    <div class="form-group"><label>Qtd</label><input type="number" id="m-f-qtd" oninput="calcAjusteTotal()"></div>
-                    <div class="form-group"><label>Unitário</label><input type="text" id="m-f-unit" oninput="maskMoney(this);calcAjusteTotal()"></div>
+                    <div class="form-group"><label>Qtd</label><input type="number" id="m-f-qtd"></div>
+                    <div class="form-group"><label>Unitário</label><input type="text" id="m-f-unit" oninput="maskMoney(this)"></div>
                 </div>
-                <div class="form-group"><label>Total</label><input type="text" id="m-f-total" readonly style="background:#f0f0f0;"></div>
-                <button class="btn btn-primary btn-block" onclick="saveAjuste()">Adicionar Ajuste</button>
+                <button class="btn btn-primary btn-block" onclick="saveAjuste()">Adicionar</button>
             `;
             document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal').style.display = 'flex';
         }
-        function calcAjusteTotal() { const q = parseFloat(document.getElementById('m-f-qtd').value)||0; const u = parseMoney(document.getElementById('m-f-unit').value); document.getElementById('m-f-total').value = formatCurrency(q*u); }
         function saveAjuste() {
             const m = document.getElementById('dash-month').value;
             const desc = document.getElementById('m-f-desc').value;
             const q = parseFloat(document.getElementById('m-f-qtd').value)||0;
             const u = parseMoney(document.getElementById('m-f-unit').value);
-            if(!desc || q <= 0 || u <= 0) return showToast('Preencha tudo!');
+            if(!desc || q <= 0 || u <= 0) return;
             if(!state.ajustes[m]) state.ajustes[m] = [];
             state.ajustes[m].push({ desc, qtd: q, valor: q*u });
             save(); showAjusteModal(); renderDashboard();
@@ -622,11 +600,51 @@
                         <div style="text-align:right;"><span style="color:var(--danger);font-weight:700;">-${x.loss}${x.unit}</span><br><small>${formatCurrency((parseFloat(x.loss)||0)*(x.price||0))}</small></div>
                     </div>
                 </div>
-            `).join('') || '<p class="text-center" style="padding:20px;color:#999;">Histórico vazio.</p>';
+            `).join('') || '<p class="text-center" style="padding:20px;color:#999;">Vazio.</p>';
         }
         function viewHistory(id) { state.dispatch = state.history.find(x => x.id === id); switchTab('dispatch'); }
 
-        // INICIALIZACAO
+        // DESPACHO
+        function renderDispatch() {
+            const x = state.dispatch;
+            if(!x) return;
+            document.getElementById('d-title').innerText = x.productName;
+            document.getElementById('d-date').innerText = formatDate(x.date);
+            const text = `Cód: ${x.productCode}\n${x.productName}\nData: ${formatDate(x.date)}\nChegou: ${x.arrived}${x.unit}\nQtd da quebra: ${x.loss}${x.unit}`;
+            document.getElementById('d-text').innerText = text;
+
+            let photosHtml = '';
+            if(x.photos.product.length) x.photos.product.forEach((src, i) => photosHtml += createPhotoItem('Produto', src, i));
+            if(x.photos.scale.length) x.photos.scale.forEach((src, i) => photosHtml += createPhotoItem('Balança', src, i));
+            if(x.photos.label) photosHtml += createPhotoItem('Etiqueta', x.photos.label, 0);
+            document.getElementById('d-photos-list').innerHTML = photosHtml || '<p>Sem fotos.</p>';
+        }
+
+        function createPhotoItem(label, src, i) {
+            return `
+                <div class="card" style="display:flex; align-items:center; gap:10px; padding:10px;">
+                    <img src="${src}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+                    <div style="flex:1;"><b>${label} ${i+1}</b></div>
+                    <button class="btn btn-primary" onclick="sharePhoto('${src}', '${label}')">📤 Enviar</button>
+                </div>
+            `;
+        }
+
+        async function sharePhoto(base64, label) {
+            try {
+                const res = await fetch(base64);
+                const blob = await res.blob();
+                const file = new File([blob], `foto_${label}.jpg`, { type: 'image/jpeg' });
+                if(navigator.share) await navigator.share({ files: [file], title: label });
+                else { const a = document.createElement('a'); a.href = base64; a.download = `foto_${label}.jpg`; a.click(); }
+            } catch (e) { showToast('Erro ao compartilhar.'); }
+        }
+
+        function sendWhatsApp() {
+            const text = encodeURIComponent(document.getElementById('d-text').innerText);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
+
         window.onload = () => {
             document.getElementById('t-date').value = new Date().toISOString().split('T')[0];
             renderHome();
